@@ -73,7 +73,7 @@ def paint_folder_rect(paint: QPainter, camera: Camera, entity_file: EntityFolder
         camera.location_world2view(entity_file.body_shape.location_left_top),
         entity_file.body_shape.width * camera.current_scale,
         entity_file.body_shape.height * camera.current_scale,
-        QColor(255, 255, 255, 10),
+        QColor(255, 255, 255, 0),
         QColor(255, 255, 255, 255)
     )
     # 再画文字

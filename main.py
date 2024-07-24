@@ -13,6 +13,7 @@ from paint.paint_utils import PainterUtils
 
 # READ_FOLDER = "D:/Projects/Project-Tools/CodeEmpire/test_file"
 READ_FOLDER = "D:/Projects/Project-Tools/CodeEmpire"
+READ_FOLDER = r"D:\Projects\Project-CannonWar\CannonWar-v2\src"
 
 import traceback
 
