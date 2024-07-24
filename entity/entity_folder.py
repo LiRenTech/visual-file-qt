@@ -38,7 +38,16 @@ class EntityFolder(Entity):
         for child in self.children:
             child.move(d_location)
 
-    def update_tree(self):
+    def move_to(self, location_left_top: NumberVector):
+        # 移动文件夹内所有实体
+        for child in self.children:
+            relative_location = child.body_shape.location_left_top - self.body_shape.location_left_top
+            # 这本身实际上是一个递归函数了
+            child.move_to(location_left_top + relative_location)
+        # 移动文件夹本身
+        super().move_to(location_left_top)
+
+    def update_tree_content(self):
         """
         更新文件夹树结构内容，只读取
         但是是递归的
@@ -68,7 +77,7 @@ class EntityFolder(Entity):
                 child_folder.parent = self
 
                 self.children.append(child_folder)
-                child_folder.update_tree()  # 递归调用
+                child_folder.update_tree_content()  # 递归调用
             else:
                 # 是一个文件
                 child_file = EntityFile(
@@ -83,12 +92,9 @@ class EntityFolder(Entity):
                 self.children.append(child_file)
         pass
 
-    def move_by_drag(self, new_location: NumberVector):
-        self.location = new_location
-
     def adjust(self):
         """
-        调整文件夹框框的宽度和长度
+        调整文件夹框框的宽度和长度，扩大或缩进，使得将子一层文件都直观上包含进来
         该调整过程是相对于文件树形结构 自底向上的
         :return:
         """
@@ -115,7 +121,7 @@ class EntityFolder(Entity):
         self.parent.adjust() if self.parent else None
         pass
 
-    def adjust_tree(self):
+    def adjust_tree_location(self):
         """
         提供给外界调用
         :return:
@@ -136,14 +142,23 @@ class EntityFolder(Entity):
                 # 是文件夹，继续递归
                 self._adjust_tree_dfs(child)
         # ===
+        if not isinstance(folder, EntityFolder):
+            return
 
         # 调整当前文件夹里的所有实体顺序位置
         # 暂时采取竖着放的策略
         current_y = folder.body_shape.location_left_top.y + self.PADDING
         for child in folder.children:
-            child.body_shape.location_left_top = NumberVector(folder.body_shape.location_left_top.x, current_y)
+            # 顶部对齐，不能直接修改位置来对齐，因为如果是一个文件夹，会导致它的子文件脱离了位置。
+            print("正在移动子文件或文件夹位置：", child.full_path)
+            child.move_to(NumberVector(
+                folder.body_shape.location_left_top.x + self.PADDING,
+                current_y
+            ))
             current_y += child.body_shape.height + self.PADDING
             # child.adjust()  # 这一行可能有点多余
+            # 缩紧
+        folder.adjust()
         pass
 
     def __repr__(self):

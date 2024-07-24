@@ -13,8 +13,8 @@ class FileObserver:
 
         self.root_folder: EntityFolder = EntityFolder(NumberVector(0, 0), self.folder_full_path)
         # 更新树结构
-        self.root_folder.update_tree()
-        self.root_folder.adjust_tree()
+        self.root_folder.update_tree_content()
+        self.root_folder.adjust_tree_location()
         # self.root_folder.adjust()
 
         # 当前正在拖拽的

@@ -20,3 +20,11 @@ class Entity:
         :return:
         """
         self.body_shape.location_left_top += d_location
+
+    def move_to(self, location: NumberVector):
+        """
+        移动实体到指定位置
+        :param location:
+        :return:
+        """
+        self.body_shape.location_left_top = location

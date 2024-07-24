@@ -13,6 +13,7 @@ from paint.paint_utils import PainterUtils
 
 # READ_FOLDER = "D:/Projects/Project-Tools/CodeEmpire/test_file"
 READ_FOLDER = "D:/Projects/Project-Tools/CodeEmpire"
+# READ_FOLDER = "D:/Desktop/test"
 
 
 class Canvas(QWidget):
@@ -28,7 +29,6 @@ class Canvas(QWidget):
         self.camera = Camera(NumberVector.zero(), 1920, 1080)
 
         # 文件和内容相关
-        self.file_path = ""
         self.file_observer = FileObserver(READ_FOLDER)
 
         # 创建一个定时器用于定期更新窗口
