@@ -13,6 +13,10 @@ from paint.paint_utils import PainterUtils
 
 # READ_FOLDER = "D:/Projects/Project-Tools/CodeEmpire/test_file"
 READ_FOLDER = "D:/Projects/Project-Tools/CodeEmpire"
+
+import traceback
+
+
 # READ_FOLDER = "D:/Desktop/test"
 
 
@@ -72,35 +76,38 @@ class Canvas(QWidget):
 
     def mousePressEvent(self, event: QMouseEvent):
         if event.button() == Qt.LeftButton:
+
             point_view_location = NumberVector(event.pos().x(), event.pos().y())
             point_world_location = self.camera.location_view2world(point_view_location)
             entity = self.file_observer.get_entity_by_location(point_world_location)
             if entity:
                 # 让它吸附在鼠标上
                 if isinstance(entity, EntityFile):
-                    print(entity.full_path)
                     pass
                 elif isinstance(entity, EntityFolder):
-                    print(entity.full_path)
                     pass
                 self.file_observer.dragging_entity = entity
                 self.file_observer.dragging_offset = point_world_location - entity.body_shape.location_left_top
             else:
                 self.file_observer.dragging_entity = None
-            pass
 
     def mouseMoveEvent(self, event: QMouseEvent):
         if event.buttons() == Qt.LeftButton:
-            point_view_location = NumberVector(event.pos().x(), event.pos().y())
-            point_world_location = self.camera.location_view2world(point_view_location)
-            if self.file_observer.dragging_entity:
-                # 让它跟随鼠标移动
-                print(self.file_observer.dragging_entity)
-                new_left_top = point_world_location - self.file_observer.dragging_offset
-                d_location = new_left_top - self.file_observer.dragging_entity.body_shape.location_left_top
-                self.file_observer.dragging_entity.move(d_location)
+            try:
+                point_view_location = NumberVector(event.pos().x(), event.pos().y())
+                point_world_location = self.camera.location_view2world(point_view_location)
+                if self.file_observer.dragging_entity:
+                    # 让它跟随鼠标移动
+                    new_left_top = point_world_location - self.file_observer.dragging_offset
+                    d_location = new_left_top - self.file_observer.dragging_entity.body_shape.location_left_top
+                    self.file_observer.dragging_entity.move(d_location)
 
-                self.file_observer.dragging_entity.parent.adjust()
+                    if self.file_observer.dragging_entity.parent:
+                        # 由于可能拖动的是最外层文件夹，导致没有parent，所以加判断
+                        self.file_observer.dragging_entity.parent.adjust()
+            except Exception as e:
+                print(e)
+                traceback.print_exc()
                 pass
 
     def mouseReleaseEvent(self, event: QMouseEvent):
@@ -109,7 +116,7 @@ class Canvas(QWidget):
             point_world_location = self.camera.location_view2world(point_view_location)
             entity = self.file_observer.get_entity_by_location(point_world_location)
             if entity:
-                print("release", entity)
+                pass
             else:
                 # 让它脱离鼠标吸附
                 self.file_observer.dragging_entity = None
