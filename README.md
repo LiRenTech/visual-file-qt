@@ -27,14 +27,16 @@ TODO:
 
 将摆好的图案保存为文件，下次打开时直接读取文件，不需要每次都重新摆放。
 
-可能的名字：
+开发相关：
 
-rectangle-explorer
+更新assets资源文件指令
 
-space-code
+```commandline
+pyrcc5 -o assets/image.rcc -o assets/assets.py
+```
 
-space-folder
+打包指令
 
-folder-2d
-
-explorer-2d
+```commandline
+pyinstaller --onefile --windowed --icon=./assets/favicon.ico main.py -n visual-file
+```

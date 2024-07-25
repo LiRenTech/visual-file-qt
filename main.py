@@ -1,8 +1,14 @@
 import traceback
 
 from PyQt5.QtWidgets import QApplication, QWidget
-from PyQt5.QtGui import QPainter, QMouseEvent, QWheelEvent, QKeyEvent, QColor
+from PyQt5.QtGui import QPainter, QMouseEvent, QWheelEvent, QKeyEvent, QColor, QIcon
 from PyQt5.QtCore import Qt, QTimer
+
+from assets import assets
+
+# 是为了引入assets文件夹中的资源文件，看似是灰色的没有用，但实际不能删掉
+# 只是为了让pyinstaller打包时能打包到exe文件中。
+# 需要进入assets文件夹后在命令行输入指令 `pyrcc5 image.rcc -o assets.py` 来更新assets.py文件
 
 from camera import Camera
 from data_struct.number_vector import NumberVector
@@ -34,6 +40,7 @@ class Canvas(QWidget):
         # 设置窗口标题和尺寸
         self.setWindowTitle("VisualFile 大型文件夹直观可视化工具")
         self.setGeometry(0, 0, 1920, 1080)
+        self.setWindowIcon(QIcon(":/favicon.ico"))
         # 设置窗口置顶
         self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
 
