@@ -33,6 +33,23 @@ def paint_grid(paint: QPainter, camera: Camera):
         print(e)
 
 
+def paint_details_data(paint: QPainter, camera: Camera):
+    """
+    左上角绘制细节信息
+    :param paint:
+    :param camera:
+    :return:
+    """
+    PainterUtils.paint_word_from_left_top(
+        paint,
+        NumberVector(0, 10),  # 左上角坐标
+        f"camera scale: {camera.current_scale:.2f}",
+        12,
+        QColor(255, 255, 255, 100),
+    )
+    pass
+
+
 def paint_rect_in_world(paint: QPainter,
                         camera: Camera,
                         rect: Rectangle,
@@ -59,6 +76,9 @@ def paint_file_rect(paint: QPainter, camera: Camera, entity_file: EntityFile):
         QColor(0, 0, 0, 255),
         QColor(255, 255, 255, 255)
     )
+    # camera scale < 0.05 的时候不渲染文字了，会导致文字突然变大，重叠一大堆
+    if camera.current_scale < 0.05:
+        return
     # 再画文字
     PainterUtils.paint_word_from_left_top(
         paint,
@@ -88,6 +108,8 @@ def paint_folder_rect(paint: QPainter, camera: Camera, entity_file: EntityFolder
         QColor(255, 255, 255, 0),
         QColor(255, 255, 255, 255)
     )
+    if camera.current_scale < 0.05:
+        return
     # 再画文字
     PainterUtils.paint_word_from_left_top(
         paint,

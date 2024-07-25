@@ -1,3 +1,5 @@
+import traceback
+
 from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtGui import QPainter, QMouseEvent, QWheelEvent, QKeyEvent, QColor
 from PyQt5.QtCore import Qt, QPoint, QTimer
@@ -8,14 +10,11 @@ from entity.entity_file import EntityFile
 from entity.entity_folder import EntityFolder
 from file_observer import FileObserver
 from file_openner import open_file
-from paint.paint_elements import paint_grid, paint_file_rect, paint_rect_in_world, paint_folder_rect
-from paint.paint_utils import PainterUtils
+from paint.paint_elements import paint_grid, paint_file_rect, paint_rect_in_world, paint_folder_rect, paint_details_data
 
 # READ_FOLDER = "D:/Projects/Project-Tools/CodeEmpire/test_file"
 READ_FOLDER = "D:/Projects/Project-Tools/CodeEmpire"
 READ_FOLDER = r"D:\Projects\Project-CannonWar\CannonWar-v2\src"
-
-import traceback
 
 
 # READ_FOLDER = "D:/Desktop/test"
@@ -77,6 +76,8 @@ class Canvas(QWidget):
                 QColor(0, 0, 0, 0),
                 QColor(255, 0, 0)
             )
+        # 绘制细节信息
+        paint_details_data(painter, self.camera)
 
     def mousePressEvent(self, event: QMouseEvent):
         if event.button() == Qt.LeftButton:
@@ -126,7 +127,6 @@ class Canvas(QWidget):
             )
             diff_location = current_mouse_move_location - self._last_mouse_move_location
             self.camera.location -= diff_location
-            print("middle button")
 
     def mouseReleaseEvent(self, event: QMouseEvent):
         if event.button() == Qt.LeftButton:
