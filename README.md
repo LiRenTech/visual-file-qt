@@ -40,3 +40,24 @@ pyrcc5 -o assets/image.rcc -o assets/assets.py
 ```commandline
 pyinstaller --onefile --windowed --icon=./assets/favicon.ico main.py -n visual-file
 ```
+
+## 布局文件格式
+
+```js
+{
+	"layout": [
+        {
+            "kind": "directory" | "file",
+            "name": "abc",  // 文件夹名字或者文件名，不需要全路径，只需要一个名字即可
+            "bodyShape": {
+                "width": 500,
+                "height": 100,
+                "locationLeftTop": [155, 4154]
+            },
+            "children": [
+                // ...继续嵌套
+            ]
+        }
+    ]
+}
+```

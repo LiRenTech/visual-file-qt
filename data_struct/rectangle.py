@@ -7,6 +7,20 @@ class Rectangle:
         self.width: float = width
         self.height: float = height
 
+    def output_data(self) -> dict:
+        return {
+            "width": self.width,
+            "height": self.height,
+            "locationLeftTop": [self.location_left_top.x, self.location_left_top.y],
+        }
+
+    def read_data(self, data: dict):
+        self.width = data["width"]
+        self.height = data["height"]
+        self.location_left_top = NumberVector(
+            data["locationLeftTop"][0], data["locationLeftTop"][1]
+        )
+
     def __contains__(self, item) -> bool:
         if isinstance(item, NumberVector):
             return (

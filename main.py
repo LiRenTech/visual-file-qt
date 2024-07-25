@@ -1,6 +1,14 @@
 import traceback
+import json
 
-from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5.QtWidgets import (
+    QApplication,
+    QWidget,
+    QDesktopWidget,
+    QAction,
+    QMainWindow,
+    QFileDialog,
+)
 from PyQt5.QtGui import QPainter, QMouseEvent, QWheelEvent, QKeyEvent, QColor, QIcon
 from PyQt5.QtCore import Qt, QTimer
 
@@ -33,20 +41,14 @@ READ_FOLDER = r"D:\Projects\Project-CannonWar\CannonWar-v2\src"
 # READ_FOLDER = "D:/Desktop/test"
 
 
-class Canvas(QWidget):
+class Canvas(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        # 设置窗口标题和尺寸
-        self.setWindowTitle("VisualFile 大型文件夹直观可视化工具")
-        self.setGeometry(0, 0, 1920, 1080)
-        self.setWindowIcon(QIcon(":/favicon.ico"))
-        # 设置窗口置顶
-        self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
+        self.init_ui()
 
+        # 重要对象绑定
         self.camera = Camera(NumberVector.zero(), 1920, 1080)
-
-        # 文件和内容相关
         self.file_observer = FileObserver(READ_FOLDER)
 
         # 创建一个定时器用于定期更新窗口
@@ -58,6 +60,98 @@ class Canvas(QWidget):
 
         # 窗口移动相关
         self._last_mouse_move_location = NumberVector.zero()  # 注意这是一个世界坐标
+
+    def init_ui(self):
+        # 设置窗口标题和尺寸
+        self.setWindowTitle("VisualFile 大型文件夹直观可视化工具")
+
+        self.setGeometry(0, 0, 1920, 1080)
+        self.setWindowIcon(QIcon(":/favicon.ico"))
+
+        # 创建菜单栏
+        menubar = self.menuBar()
+        # 创建 "File" 菜单
+        file_menu = menubar.addMenu("File")
+        # 创建 "Open" 菜单项
+        open_action = QAction("直接读取文件夹", self)
+        open_action.setShortcut("Ctrl+O")
+        file_menu.addAction(open_action)
+        open_action.triggered.connect(self.on_open)
+
+        # 创建 "Save" 菜单项
+        save_action = QAction("导出布局文件", self)
+        save_action.setShortcut("Ctrl+S")
+        file_menu.addAction(save_action)
+        save_action.triggered.connect(self.on_save)
+
+        # 创建 "Update" 菜单项
+        update_action = QAction("更新文件夹", self)
+        update_action.setShortcut("Ctrl+U")
+        file_menu.addAction(update_action)
+        update_action.triggered.connect(self.on_update)
+
+        # 创建 导入 菜单项
+        import_action = QAction("导入布局文件并更新布局", self)
+        import_action.setShortcut("Ctrl+I")
+        file_menu.addAction(import_action)
+        import_action.triggered.connect(self.on_import)
+        pass
+
+    def on_open(self):
+        # 直接读取文件
+        directory = QFileDialog.getExistingDirectory(self, "选择要直观化查看的文件夹")
+
+        if directory:
+            self.file_observer.update_file_path(directory)
+        pass
+
+    def on_save(self):
+
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "保存布局文件", "", "JSON Files (*.json);;All Files (*)"
+        )
+
+        if file_path:
+            # 如果用户选择了文件并点击了保存按钮
+            # 保存布局文件
+            layout: dict = self.file_observer.output_layout_dict()
+
+            # 确保文件扩展名为 .json
+            if not file_path.endswith(".json"):
+                file_path += ".json"
+
+            with open(file_path, "w") as f:
+                json.dump(layout, f)
+        else:
+            # 如果用户取消了保存操作
+            print("Save operation cancelled.")
+
+    def on_update(self):
+        # 更新文件夹内容
+        print("更新文件")
+        pass
+
+    def on_import(self):
+        # 显示文件打开对话框
+        file_path, _ = QFileDialog.getOpenFileName(
+            self, "导入布局文件", "", "JSON Files (*.json);;All Files (*)"
+        )
+
+        if file_path:
+            # 如果用户选择了文件并点击了打开按钮
+            # 在这里编写导入文件的逻辑
+            with open(file_path, "r") as f:
+                layout_dict = json.load(f)
+
+            print(type(layout_dict), layout_dict)
+            try:
+                self.file_observer.read_layout_dict(layout_dict)
+            except Exception as e:
+                traceback.print_exc()
+                print(e)
+        else:
+            # 如果用户取消了打开操作
+            print("Import operation cancelled.")
 
     def tick(self):
         self.camera.tick()
@@ -80,7 +174,7 @@ class Canvas(QWidget):
         )
 
         # 使用黑色填充整个窗口
-        painter.fillRect(rect, Qt.black)
+        painter.fillRect(rect, QColor(0, 0, 0, 255))
         # 画网格
         paint_grid(painter, self.camera)
 

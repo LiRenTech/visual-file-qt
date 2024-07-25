@@ -45,6 +45,55 @@ class EntityFolder(Entity):
         # 这个矩形有点麻烦，它可能应该是一个动态变化的东西，不应该变的是它的左上角位置，变得是他的大小
         self.adjust()
 
+    def output_data(self) -> dict:
+        """
+        递归的输出数据，最终返回一个字典
+        :return:
+        """
+        return {
+            "kind": "directory",
+            "name": self.folder_name,
+            "bodyShape": self.body_shape.output_data(),
+            "children": [child.output_data() for child in self.children],
+        }
+
+    def read_data(self, data: dict):
+        """
+        读取数据 直接导致文件夹更新布局位置信息
+        :param data:
+        :return:
+        """
+        if data["kind"] != "directory":
+            raise ValueError("kind should be directory")
+        if data["name"] != self.folder_name:
+            raise ValueError("读取的文件名不匹配", data["name"], self.folder_name)
+        # 可以是先序遍历
+        # 先更新内容
+        self.body_shape = self.body_shape.read_data(data["bodyShape"])
+        # ===
+        print(self.folder_name, self.full_path)
+        for child in self.children:
+            if isinstance(child, EntityFolder):
+                for data_child in data["children"]:
+                    if child.folder_name == data_child["name"]:
+                        child.read_data(data_child)
+                        break
+                else:
+                    # 没找到，说明有布局文件缺失，或者文件是新增的。
+                    # 将这个对齐到当前的左上角
+                    child.move_to(self.body_shape.location_left_top)
+                    pass
+            elif isinstance(child, EntityFile):
+                for data_child in data["children"]:
+                    if child.file_name == data_child["name"]:
+                        child.read_data(data_child)
+                        break
+                else:
+                    child.move_to(self.body_shape.location_left_top)
+                    pass
+
+        pass
+
     def move(self, d_location: NumberVector):
         # 不仅，要让文件夹本身移动
         super().move(d_location)

@@ -1,3 +1,4 @@
+import json
 import os
 import random
 
@@ -17,12 +18,40 @@ class FileObserver:
         # 更新树结构
         self.root_folder.update_tree_content()
         self.root_folder.adjust_tree_location()
-        # self.root_folder.adjust()
 
         # 当前正在拖拽的
         self.dragging_entity: EntityFile | EntityFolder | None = None
         # 拖拽点相对于原点的偏移
         self.dragging_offset: NumberVector = NumberVector(0, 0)
+
+    def update_file_path(self, new_path: str):
+        """
+        更新文件路径，相当于外界用户换了一个想要查看的文件夹
+        :param new_path:
+        :return:
+        """
+        self.folder_full_path = new_path
+        self.root_folder = EntityFolder(NumberVector(0, 0), self.folder_full_path)
+        self.root_folder.update_tree_content()
+        self.root_folder.adjust_tree_location()
+        self.dragging_entity = None
+
+    def output_layout_dict(self) -> dict:
+        """
+        输出当前文件夹的布局文件
+        :return:
+        """
+        return {"layout": [self.root_folder.output_data()]}
+
+    def read_layout_dict(self, layout_file: dict):
+        """
+        读取布局文件，恢复当前文件夹的布局
+        :param layout_file:
+        :return:
+        """
+        # FIXME: 这里一下子就闪退了
+        self.root_folder.read_data(layout_file["layout"][0])
+        self.dragging_entity = None
 
     def _entity_files(self, folder: EntityFolder) -> list[EntityFile]:
         """

@@ -61,3 +61,18 @@ class EntityFile(Entity):
 
         # 还要让父文件夹收缩调整
         self.parent.adjust()
+
+    def output_data(self) -> dict:
+        return {
+            "kind": "file",
+            "name": self.file_name,
+            "bodyShape": self.body_shape.output_data(),
+        }
+
+    def read_data(self, data: dict):
+        if data["kind"] != "file":
+            raise ValueError("kind should be file")
+        if data["name"] != self.file_name:
+            raise ValueError("读取的文件名不匹配", data["name"], self.file_name)
+
+        self.body_shape.read_data(data["bodyShape"])
