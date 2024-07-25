@@ -10,8 +10,13 @@ class Rectangle:
     def __contains__(self, item) -> bool:
         if isinstance(item, NumberVector):
             return (
-                    (self.location_left_top.x <= item.x <= self.location_left_top.x + self.width) and
-                    (self.location_left_top.y <= item.y <= self.location_left_top.y + self.height)
+                self.location_left_top.x
+                <= item.x
+                <= self.location_left_top.x + self.width
+            ) and (
+                self.location_left_top.y
+                <= item.y
+                <= self.location_left_top.y + self.height
             )
         else:
             return False
@@ -36,26 +41,33 @@ class Rectangle:
     def get_fore_points(self) -> list[NumberVector]:
         return [
             NumberVector(self.location_left_top.x, self.location_left_top.y),
-            NumberVector(self.location_left_top.x + self.width, self.location_left_top.y),
-            NumberVector(self.location_left_top.x + self.width, self.location_left_top.y + self.height),
-            NumberVector(self.location_left_top.x, self.location_left_top.y + self.height)
+            NumberVector(
+                self.location_left_top.x + self.width, self.location_left_top.y
+            ),
+            NumberVector(
+                self.location_left_top.x + self.width,
+                self.location_left_top.y + self.height,
+            ),
+            NumberVector(
+                self.location_left_top.x, self.location_left_top.y + self.height
+            ),
         ]
 
     @property
     def center(self) -> NumberVector:
         return NumberVector(
             self.location_left_top.x + self.width / 2,
-            self.location_left_top.y + self.height / 2
+            self.location_left_top.y + self.height / 2,
         )
 
-    def is_collision(self, rect: 'Rectangle') -> bool:
+    def is_collision(self, rect: "Rectangle") -> bool:
         collision_x = self.right() >= rect.left() and rect.right() >= self.left()
         collision_y = self.bottom() >= rect.top() and rect.bottom() >= self.top()
         return collision_x and collision_y
 
 
 # test
-if __name__ == '__main__':
+if __name__ == "__main__":
     r1 = Rectangle(NumberVector(0, 0), 10, 10)
     r2 = Rectangle(NumberVector(5, 5), 10, 10)
     print(r1.is_collision(r2))  # True

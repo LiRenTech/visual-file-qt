@@ -10,10 +10,22 @@ class EntityFolder(Entity):
     """
     文件夹矩形
     """
+
     PADDING = 50
 
     # 通用排除的文件夹
-    exclusion_list = ["__pycache__", ".git", ".idea", "node_modules", "dist", "build", "venv", "env", "temp", ".vscode"]
+    exclusion_list = [
+        "__pycache__",
+        ".git",
+        ".idea",
+        "node_modules",
+        "dist",
+        "build",
+        "venv",
+        "env",
+        "temp",
+        ".vscode",
+    ]
 
     def __init__(self, location_left_top: NumberVector, full_path: str):
         full_path = full_path.replace("\\", "/")
@@ -22,11 +34,13 @@ class EntityFolder(Entity):
         self.full_path = full_path
         self.location = location_left_top
         self.folder_name = folder_name
-        self.body_shape = Rectangle(location_left_top, get_width_by_file_name(folder_name) * 2, 500)
+        self.body_shape = Rectangle(
+            location_left_top, get_width_by_file_name(folder_name) * 2, 500
+        )
         super().__init__(self.body_shape)
         # 属性节点关系
-        self.parent: Optional['EntityFolder'] = None
-        self.children: list['EntityFolder' | EntityFile] = []
+        self.parent: Optional["EntityFolder"] = None
+        self.children: list["EntityFolder" | EntityFile] = []
 
         # 这个矩形有点麻烦，它可能应该是一个动态变化的东西，不应该变的是它的左上角位置，变得是他的大小
         self.adjust()
@@ -71,7 +85,9 @@ class EntityFolder(Entity):
         """
         # 移动文件夹内所有实体
         for child in self.children:
-            relative_location = child.body_shape.location_left_top - self.body_shape.location_left_top
+            relative_location = (
+                child.body_shape.location_left_top - self.body_shape.location_left_top
+            )
             # 这本身实际上是一个递归函数了
             child.move_to(location_left_top + relative_location)
         # 移动文件夹本身
@@ -84,6 +100,7 @@ class EntityFolder(Entity):
         :return:
         """
         import os
+
         # 如果是一个文件夹，往右放
         # 如果是一个文件，往下放
 
@@ -98,10 +115,7 @@ class EntityFolder(Entity):
                     continue
 
                 # 又是一个子文件夹
-                child_folder = EntityFolder(
-                    put_location,
-                    full_path_sub
-                )
+                child_folder = EntityFolder(put_location, full_path_sub)
                 put_location += NumberVector(500, 0)  # 往右放
 
                 child_folder.parent = self
@@ -110,11 +124,7 @@ class EntityFolder(Entity):
                 child_folder.update_tree_content()  # 递归调用
             else:
                 # 是一个文件
-                child_file = EntityFile(
-                    put_location,
-                    full_path_sub,
-                    self
-                )
+                child_file = EntityFile(put_location, full_path_sub, self)
                 put_location = NumberVector(0, 120)  # 往下放
 
                 child_file.parent = self
@@ -139,11 +149,19 @@ class EntityFolder(Entity):
 
         for child in self.children:
             left_bound = min(left_bound, child.body_shape.location_left_top.x)
-            right_bound = max(right_bound, child.body_shape.location_left_top.x + child.body_shape.width)
+            right_bound = max(
+                right_bound,
+                child.body_shape.location_left_top.x + child.body_shape.width,
+            )
             top_bound = min(top_bound, child.body_shape.location_left_top.y)
-            bottom_bound = max(bottom_bound, child.body_shape.location_left_top.y + child.body_shape.height)
+            bottom_bound = max(
+                bottom_bound,
+                child.body_shape.location_left_top.y + child.body_shape.height,
+            )
 
-        self.body_shape.location_left_top = NumberVector(left_bound - self.PADDING, top_bound - self.PADDING)
+        self.body_shape.location_left_top = NumberVector(
+            left_bound - self.PADDING, top_bound - self.PADDING
+        )
         self.body_shape.width = right_bound - left_bound + self.PADDING * 2
         self.body_shape.height = bottom_bound - top_bound + self.PADDING * 2
         if not self.parent:
@@ -165,7 +183,7 @@ class EntityFolder(Entity):
         """
         self._adjust_tree_dfs(self)
 
-    def _adjust_tree_dfs(self, folder: 'EntityFolder'):
+    def _adjust_tree_dfs(self, folder: "EntityFolder"):
         """
         递归调整文件夹树形结构位置
         应该是一个后根遍历的过程，tips：这种多叉树不存在中序遍历，只有先序和后序。
@@ -188,10 +206,11 @@ class EntityFolder(Entity):
         current_y = folder.body_shape.location_left_top.y + self.PADDING
         for child in folder.children:
             # 顶部对齐，不能直接修改位置来对齐，因为如果是一个文件夹，会导致它的子文件脱离了位置。
-            child.move_to(NumberVector(
-                folder.body_shape.location_left_top.x + self.PADDING,
-                current_y
-            ))
+            child.move_to(
+                NumberVector(
+                    folder.body_shape.location_left_top.x + self.PADDING, current_y
+                )
+            )
             current_y += child.body_shape.height + self.PADDING
 
         # rectangle_list = [child.body_shape for child in folder.children]
@@ -225,9 +244,9 @@ def sort_rectangle(rectangles: list[Rectangle], margin: float) -> list[Rectangle
     横向放置，减少了空间浪费。
     """
 
-    def append_right(origin: Rectangle,
-                     rect: Rectangle,
-                     rects: list[Rectangle]) -> None:
+    def append_right(
+        origin: Rectangle, rect: Rectangle, rects: list[Rectangle]
+    ) -> None:
         rect.location_left_top.x = origin.right() + margin
         rect.location_left_top.y = origin.top()
         # 碰撞检测
@@ -240,9 +259,9 @@ def sort_rectangle(rectangles: list[Rectangle], margin: float) -> list[Rectangle
                     collision = True
                     break
 
-    def append_bottom(origin: Rectangle,
-                      rect: Rectangle,
-                      rects: list[Rectangle]) -> None:
+    def append_bottom(
+        origin: Rectangle, rect: Rectangle, rects: list[Rectangle]
+    ) -> None:
         rect.location_left_top.y = origin.bottom() + margin
         rect.location_left_top.x = origin.left()
         # 碰撞检测

@@ -36,6 +36,7 @@ def show_rectangle(rectangles: list[Rectangle]):
     用海龟绘图 显示所有矩形
     """
     import turtle
+
     # 创建一个绘图窗口
     screen = turtle.Screen()
     screen.title("Rectangle Visualization")
@@ -68,50 +69,61 @@ def show_rectangle(rectangles: list[Rectangle]):
 def main():
     rectangles_list = [
         # 斜对角放置两个
-        sort_rectangle([
-            Rectangle(NumberVector(0, 0), 10, 10),
-            Rectangle(NumberVector(10, 10), 1, 1)
-        ], 2),
-
+        sort_rectangle(
+            [
+                Rectangle(NumberVector(0, 0), 10, 10),
+                Rectangle(NumberVector(10, 10), 1, 1),
+            ],
+            2,
+        ),
         # 五个长条文件
-        sort_rectangle([
-            Rectangle(NumberVector(0, 0), 500, 100),
-            Rectangle(NumberVector(0, 0), 500, 100),
-            Rectangle(NumberVector(0, 0), 500, 100),
-            Rectangle(NumberVector(0, 0), 500, 100),
-            Rectangle(NumberVector(0, 0), 500, 100),
-        ], 50),
-
+        sort_rectangle(
+            [
+                Rectangle(NumberVector(0, 0), 500, 100),
+                Rectangle(NumberVector(0, 0), 500, 100),
+                Rectangle(NumberVector(0, 0), 500, 100),
+                Rectangle(NumberVector(0, 0), 500, 100),
+                Rectangle(NumberVector(0, 0), 500, 100),
+            ],
+            50,
+        ),
         # 五个参差不齐的长条
-        sort_rectangle([
-            Rectangle(NumberVector(0, 0), 500, 100),
-            Rectangle(NumberVector(0, 0), 600, 100),
-            Rectangle(NumberVector(0, 0), 750, 100),
-            Rectangle(NumberVector(0, 0), 400, 100),
-            Rectangle(NumberVector(0, 0), 200, 100),
-        ], 50),
-
+        sort_rectangle(
+            [
+                Rectangle(NumberVector(0, 0), 500, 100),
+                Rectangle(NumberVector(0, 0), 600, 100),
+                Rectangle(NumberVector(0, 0), 750, 100),
+                Rectangle(NumberVector(0, 0), 400, 100),
+                Rectangle(NumberVector(0, 0), 200, 100),
+            ],
+            50,
+        ),
         # 五个正方形
-        sort_rectangle([
-            Rectangle(NumberVector(0, 0), 100, 100),
-            Rectangle(NumberVector(0, 0), 100, 100),
-            Rectangle(NumberVector(0, 0), 100, 100),
-            Rectangle(NumberVector(0, 0), 100, 100),
-            Rectangle(NumberVector(0, 0), 100, 100),
-        ], 50),
-
+        sort_rectangle(
+            [
+                Rectangle(NumberVector(0, 0), 100, 100),
+                Rectangle(NumberVector(0, 0), 100, 100),
+                Rectangle(NumberVector(0, 0), 100, 100),
+                Rectangle(NumberVector(0, 0), 100, 100),
+                Rectangle(NumberVector(0, 0), 100, 100),
+            ],
+            50,
+        ),
         # 四个长条文件和一个大正方形文件夹
-        sort_rectangle([
-            Rectangle(NumberVector(0, 0), 500, 100),
-            Rectangle(NumberVector(0, 0), 520, 100),
-            Rectangle(NumberVector(0, 0), 540, 100),
-            Rectangle(NumberVector(0, 0), 456, 100),
-            Rectangle(NumberVector(0, 0), 600, 1000),
-        ], 50)
+        sort_rectangle(
+            [
+                Rectangle(NumberVector(0, 0), 500, 100),
+                Rectangle(NumberVector(0, 0), 520, 100),
+                Rectangle(NumberVector(0, 0), 540, 100),
+                Rectangle(NumberVector(0, 0), 456, 100),
+                Rectangle(NumberVector(0, 0), 600, 1000),
+            ],
+            50,
+        ),
     ]
 
     show_rectangle(rectangles_list[2])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

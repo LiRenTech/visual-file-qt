@@ -1,6 +1,7 @@
 """
 这个里面绘制的元素都是直接基于渲染坐标来绘制的，不是世界坐标
 """
+
 from PyQt5.QtCore import QPoint
 from PyQt5.QtGui import QPainter, QColor, QPen, QFont, QFontMetrics
 
@@ -10,7 +11,13 @@ import traceback
 
 class PainterUtils:
     @staticmethod
-    def paint_solid_line(painter: QPainter, point1: NumberVector, point2: NumberVector, color: QColor, width: float):
+    def paint_solid_line(
+        painter: QPainter,
+        point1: NumberVector,
+        point2: NumberVector,
+        color: QColor,
+        width: float,
+    ):
         """
         绘制一条实线
         :param painter:
@@ -31,12 +38,14 @@ class PainterUtils:
         pass
 
     @staticmethod
-    def paint_dashed_line(painter: QPainter,
-                          point1: NumberVector,
-                          point2: NumberVector,
-                          color: QColor,
-                          width: float,
-                          dash_length: float):
+    def paint_dashed_line(
+        painter: QPainter,
+        point1: NumberVector,
+        point2: NumberVector,
+        color: QColor,
+        width: float,
+        dash_length: float,
+    ):
         """
         绘制一条虚线
         :param painter:
@@ -52,7 +61,7 @@ class PainterUtils:
         painter.setRenderHint(QPainter.Antialiasing)
         dx = point2.x - point1.x
         dy = point2.y - point1.y
-        length = (dx ** 2 + dy ** 2) ** 0.5
+        length = (dx**2 + dy**2) ** 0.5
         num_dashes = int(length / dash_length)
         if num_dashes == 0:
             num_dashes = 1
@@ -61,13 +70,20 @@ class PainterUtils:
         painter.setPen(QColor(0, 0, 0, 0))
         painter.setBrush(QColor(0, 0, 0, 0))
         painter.setRenderHint(QPainter.Antialiasing, False)
-        painter.drawLines(int(point1.x), int(point1.y), int(point2.x), int(point2.y), dash_pattern)
+        painter.drawLines(
+            int(point1.x), int(point1.y), int(point2.x), int(point2.y), dash_pattern
+        )
         pass
 
     @staticmethod
-    def paint_rect_from_left_top(painter: QPainter, left_top: NumberVector, width: float, height: float,
-                                 fill_color: QColor,
-                                 stroke_color: QColor):
+    def paint_rect_from_left_top(
+        painter: QPainter,
+        left_top: NumberVector,
+        width: float,
+        height: float,
+        fill_color: QColor,
+        stroke_color: QColor,
+    ):
         """
         绘制一个矩形，左上角坐标为left_top，宽为width，高为height，填充色为fill_color，边框色为stroke_color
         :param painter:
@@ -89,7 +105,13 @@ class PainterUtils:
         pass
 
     @staticmethod
-    def paint_word_from_left_top(painter: QPainter, left_top: NumberVector, text: str, font_size: float, color: QColor):
+    def paint_word_from_left_top(
+        painter: QPainter,
+        left_top: NumberVector,
+        text: str,
+        font_size: float,
+        color: QColor,
+    ):
         """
         绘制一个文本，左上角坐标为left_top，文本为text，字体大小为font_size，颜色为color
         :param painter:

@@ -71,9 +71,14 @@ class Camera:
             friction = NumberVector.zero()
             if not self.speed.is_zero():
                 speed_size = self.speed.magnitude()
-                friction = self.speed.normalize() * -1 * (
-                        self.frictionCoefficient * speed_size ** self.frictionExponent)
-            self.speed += self.accelerateCommander * (self.moveAmplitude * (1 / self.current_scale))
+                friction = (
+                    self.speed.normalize()
+                    * -1
+                    * (self.frictionCoefficient * speed_size**self.frictionExponent)
+                )
+            self.speed += self.accelerateCommander * (
+                self.moveAmplitude * (1 / self.current_scale)
+            )
             self.speed += friction
 
             self.location += self.speed
@@ -100,6 +105,7 @@ class Camera:
         :param view_location:
         :return:
         """
-        v: NumberVector = (view_location - NumberVector(self.view_width / 2,
-                                                        self.view_height / 2)) / self.current_scale
+        v: NumberVector = (
+            view_location - NumberVector(self.view_width / 2, self.view_height / 2)
+        ) / self.current_scale
         return v + self.location

@@ -7,7 +7,7 @@ def get_width_by_file_name(file_name: str) -> int:
     """
     res = 0
     for c in file_name:
-        if '\u4e00' <= c <= '\u9fff':
+        if "\u4e00" <= c <= "\u9fff":
             res += 48
         else:
             res += 24

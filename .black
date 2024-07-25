@@ -1,0 +1,5 @@
+# 格式化的文件后缀
+--include=\.py$
+# 排除的文件夹
+--exclude=\.venv
+

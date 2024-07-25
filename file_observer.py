@@ -11,7 +11,9 @@ class FileObserver:
     def __init__(self, folder_full_path: str):
         self.folder_full_path: str = folder_full_path
 
-        self.root_folder: EntityFolder = EntityFolder(NumberVector(0, 0), self.folder_full_path)
+        self.root_folder: EntityFolder = EntityFolder(
+            NumberVector(0, 0), self.folder_full_path
+        )
         # 更新树结构
         self.root_folder.update_tree_content()
         self.root_folder.adjust_tree_location()
@@ -55,7 +57,9 @@ class FileObserver:
     def get_entity_files(self) -> list[EntityFile]:
         return self._entity_files(self.root_folder)
 
-    def get_entity_by_location(self, location_world: NumberVector) -> EntityFile | EntityFolder | None:
+    def get_entity_by_location(
+        self, location_world: NumberVector
+    ) -> EntityFile | EntityFolder | None:
         """
         判断一个点是否击中了某个实体文件
         :param location_world:

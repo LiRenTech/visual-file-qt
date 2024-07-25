@@ -20,7 +20,7 @@ def paint_grid(paint: QPainter, camera: Camera):
                 camera.location_world2view(NumberVector(-1000, y)),
                 camera.location_world2view(NumberVector(1000, y)),
                 line_color_light if y == 0 else line_color,
-                1 * camera.current_scale
+                1 * camera.current_scale,
             )
         for x in range(-1000, 1000, 100):
             PainterUtils.paint_solid_line(
@@ -28,7 +28,7 @@ def paint_grid(paint: QPainter, camera: Camera):
                 camera.location_world2view(NumberVector(x, -1000)),
                 camera.location_world2view(NumberVector(x, 1000)),
                 line_color_light if x == 0 else line_color,
-                1 * camera.current_scale
+                1 * camera.current_scale,
             )
     except Exception as e:
         print(e)
@@ -51,19 +51,20 @@ def paint_details_data(paint: QPainter, camera: Camera):
     pass
 
 
-def paint_rect_in_world(paint: QPainter,
-                        camera: Camera,
-                        rect: Rectangle,
-                        fill_color: QColor,
-                        stroke_color: QColor
-                        ):
+def paint_rect_in_world(
+    paint: QPainter,
+    camera: Camera,
+    rect: Rectangle,
+    fill_color: QColor,
+    stroke_color: QColor,
+):
     PainterUtils.paint_rect_from_left_top(
         paint,
         camera.location_world2view(rect.location_left_top),
         rect.width * camera.current_scale,
         rect.height * camera.current_scale,
         fill_color,
-        stroke_color
+        stroke_color,
     )
 
 
@@ -75,7 +76,7 @@ def paint_file_rect(paint: QPainter, camera: Camera, entity_file: EntityFile):
         entity_file.body_shape.width * camera.current_scale,
         entity_file.body_shape.height * camera.current_scale,
         QColor(0, 0, 0, 255),
-        QColor(255, 255, 255, 255)
+        QColor(255, 255, 255, 255),
     )
     # camera scale < 0.05 的时候不渲染文字了，会导致文字突然变大，重叠一大堆
     if camera.current_scale < 0.05:
@@ -109,7 +110,7 @@ def paint_selected_rect(paint: QPainter, camera: Camera, selected_entity: Entity
         selected_entity.body_shape.width * camera.current_scale,
         selected_entity.body_shape.height * camera.current_scale,
         QColor(255, 0, 0, 100),
-        QColor(0, 0, 0, 0)
+        QColor(0, 0, 0, 0),
     )
 
 
@@ -128,7 +129,7 @@ def paint_folder_rect(paint: QPainter, camera: Camera, entity_file: EntityFolder
         entity_file.body_shape.width * camera.current_scale,
         entity_file.body_shape.height * camera.current_scale,
         QColor(255, 255, 255, 0),
-        QColor(255, 255, 255, 255)
+        QColor(255, 255, 255, 255),
     )
     if camera.current_scale < 0.05:
         return

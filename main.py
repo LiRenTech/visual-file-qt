@@ -10,8 +10,14 @@ from entity.entity_file import EntityFile
 from entity.entity_folder import EntityFolder
 from file_observer import FileObserver
 from file_openner import open_file
-from paint.paint_elements import paint_grid, paint_file_rect, paint_rect_in_world, paint_folder_rect, \
-    paint_details_data, paint_selected_rect
+from paint.paint_elements import (
+    paint_grid,
+    paint_file_rect,
+    paint_rect_in_world,
+    paint_folder_rect,
+    paint_details_data,
+    paint_selected_rect,
+)
 
 # READ_FOLDER = "D:/Projects/Project-Tools/CodeEmpire/test_file"
 READ_FOLDER = "D:/Projects/Project-Tools/CodeEmpire"
@@ -26,7 +32,7 @@ class Canvas(QWidget):
         super().__init__()
 
         # 设置窗口标题和尺寸
-        self.setWindowTitle('VisualFile 大型文件夹直观可视化工具')
+        self.setWindowTitle("VisualFile 大型文件夹直观可视化工具")
         self.setGeometry(0, 0, 1920, 1080)
         # 设置窗口置顶
         self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
@@ -59,10 +65,11 @@ class Canvas(QWidget):
         self.camera.reset_view_size(rect.width(), rect.height())
         # 获得一个世界坐标系的视野矩形，用于排除视野之外的绘制，防止放大了之后会卡
         from data_struct.rectangle import Rectangle
+
         world_rect = Rectangle(
             self.camera.location_view2world(NumberVector(0, 0)),
             rect.width() / self.camera.current_scale,
-            rect.height() / self.camera.current_scale
+            rect.height() / self.camera.current_scale,
         )
 
         # 使用黑色填充整个窗口
@@ -89,7 +96,7 @@ class Canvas(QWidget):
                 self.camera,
                 self.file_observer.dragging_entity.body_shape,
                 QColor(0, 0, 0, 0),
-                QColor(255, 0, 0)
+                QColor(255, 0, 0),
             )
         # 绘制细节信息
         paint_details_data(painter, self.camera)
@@ -107,7 +114,9 @@ class Canvas(QWidget):
                 elif isinstance(entity, EntityFolder):
                     pass
                 self.file_observer.dragging_entity = entity
-                self.file_observer.dragging_offset = point_world_location - entity.body_shape.location_left_top
+                self.file_observer.dragging_offset = (
+                    point_world_location - entity.body_shape.location_left_top
+                )
             else:
                 self.file_observer.dragging_entity = None
         elif event.button() == Qt.MiddleButton:
@@ -121,11 +130,18 @@ class Canvas(QWidget):
         if event.buttons() == Qt.LeftButton:
             try:
                 point_view_location = NumberVector(event.pos().x(), event.pos().y())
-                point_world_location = self.camera.location_view2world(point_view_location)
+                point_world_location = self.camera.location_view2world(
+                    point_view_location
+                )
                 if self.file_observer.dragging_entity:
                     # 让它跟随鼠标移动
-                    new_left_top = point_world_location - self.file_observer.dragging_offset
-                    d_location = new_left_top - self.file_observer.dragging_entity.body_shape.location_left_top
+                    new_left_top = (
+                        point_world_location - self.file_observer.dragging_offset
+                    )
+                    d_location = (
+                        new_left_top
+                        - self.file_observer.dragging_entity.body_shape.location_left_top
+                    )
                     self.file_observer.dragging_entity.move(d_location)
             except Exception as e:
                 print(e)
@@ -214,5 +230,5 @@ def main():
     pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

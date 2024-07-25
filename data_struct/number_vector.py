@@ -45,7 +45,7 @@ class NumberVector:
         else:
             return NumberVector(self.x - other, self.y - other)
 
-    def __mul__(self, other) -> 'NumberVector':
+    def __mul__(self, other) -> "NumberVector":
         if isinstance(other, NumberVector):
             return NumberVector(self.x * other.x, self.y * other.y)
         else:
@@ -119,8 +119,8 @@ class NumberVector:
 
     def __len__(self) -> float:
         """返回向量的模长"""
-        return math.sqrt(self.x ** 2 + self.y ** 2)
+        return math.sqrt(self.x**2 + self.y**2)
 
     def magnitude(self) -> float:
         """返回向量的模长"""
-        return math.sqrt(self.x ** 2 + self.y ** 2)
+        return math.sqrt(self.x**2 + self.y**2)
