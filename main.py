@@ -2,7 +2,7 @@ import traceback
 
 from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtGui import QPainter, QMouseEvent, QWheelEvent, QKeyEvent, QColor
-from PyQt5.QtCore import Qt, QPoint, QTimer
+from PyQt5.QtCore import Qt, QTimer
 
 from camera import Camera
 from data_struct.number_vector import NumberVector
@@ -55,6 +55,9 @@ class Canvas(QWidget):
 
         # 获取窗口的尺寸
         rect = self.rect()
+        # 更新camera大小，防止放大窗口后缩放中心点还在左上部分
+        self.camera.reset_view_size(rect.width(), rect.height())
+
         # 使用黑色填充整个窗口
         painter.fillRect(rect, Qt.black)
         # 画网格

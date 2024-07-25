@@ -34,6 +34,16 @@ class Camera:
         # 可以看成一个九宫格，主要用于处理 w s a d 按键移动，
         self.accelerateCommander = NumberVector(0, 0)
 
+    def reset_view_size(self, view_width: float, view_height: float):
+        """
+        由于外层渲染区域大小发生变化，需要重新设置相机视野大小
+        :param view_width:
+        :param view_height:
+        :return:
+        """
+        self.view_width = view_width
+        self.view_height = view_height
+
     def press_move(self, moveVector: NumberVector):
         """
 
