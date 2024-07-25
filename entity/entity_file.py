@@ -34,6 +34,27 @@ class EntityFile(Entity):
 
     def move(self, d_location: NumberVector):
         super().move(d_location)
+        if not self.parent:
+            return
+        # 推移其他同层的矩形框
+        brother_entities: list[Entity] = self.parent.children
+
+        # d_location 经过测试发现不是0
+
+        for entity in brother_entities:
+            if entity == self:
+                continue
+
+            if self.body_shape.is_collision(entity.body_shape):
+                # 如果发生了碰撞，则计算两个矩形的几何中心，被撞的矩形按照几何中心连线弹开一段距离
+                # 这段距离向量的模长刚好就是d_location的模长
+                self_center_location = self.body_shape.center
+                entity_center_location = entity.body_shape.center
+                # 碰撞方向单位向量
+                d_distance = (entity_center_location - self_center_location).normalize()
+                d_distance *= d_location.magnitude()
+                # 弹开距离
+                entity.move(d_distance)
+
         # 还要让父文件夹收缩调整
-        if self.parent:
-            self.parent.adjust()
+        self.parent.adjust()

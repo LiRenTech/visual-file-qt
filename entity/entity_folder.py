@@ -37,11 +37,38 @@ class EntityFolder(Entity):
         # 还要，移动文件夹内所有实体
         for child in self.children:
             child.move(d_location)
+
+        # 推移其他同层的矩形框 TODO: 此处有点重复代码
+        if not self.parent:
+            return
+        brother_entities: list[Entity] = self.parent.children
+
+        # d_location 经过测试发现不是0
+
+        for entity in brother_entities:
+            if entity == self:
+                continue
+
+            if self.body_shape.is_collision(entity.body_shape):
+                # 如果发生了碰撞，则计算两个矩形的几何中心，被撞的矩形按照几何中心连线弹开一段距离
+                # 这段距离向量的模长刚好就是d_location的模长
+                self_center_location = self.body_shape.center
+                entity_center_location = entity.body_shape.center
+                # 碰撞方向单位向量
+                d_distance = (entity_center_location - self_center_location).normalize()
+                d_distance *= d_location.magnitude()
+                # 弹开距离
+                entity.move(d_distance)  # 这一弹，变成递归函数了
+
         # 还要让父文件夹收缩调整
-        if self.parent:
-            self.parent.adjust()
+        self.parent.adjust()
 
     def move_to(self, location_left_top: NumberVector):
+        """
+        此代码不会被用户直接拖拽调用
+        :param location_left_top:
+        :return:
+        """
         # 移动文件夹内所有实体
         for child in self.children:
             relative_location = child.body_shape.location_left_top - self.body_shape.location_left_top
@@ -119,6 +146,13 @@ class EntityFolder(Entity):
         self.body_shape.location_left_top = NumberVector(left_bound - self.PADDING, top_bound - self.PADDING)
         self.body_shape.width = right_bound - left_bound + self.PADDING * 2
         self.body_shape.height = bottom_bound - top_bound + self.PADDING * 2
+        if not self.parent:
+            return
+
+        # 扩张的边可能会导致兄弟元素发生变化
+        # 猛一想以为最多只有两个边会发生变化，但实际上由于推移多个元素的效果，可能会导致发生很复杂的变化
+        # 所以每个边都要检测
+        # TODO:
 
         # 向上调用
         self.parent.adjust() if self.parent else None
