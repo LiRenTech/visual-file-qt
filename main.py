@@ -57,6 +57,13 @@ class Canvas(QWidget):
         rect = self.rect()
         # 更新camera大小，防止放大窗口后缩放中心点还在左上部分
         self.camera.reset_view_size(rect.width(), rect.height())
+        # 获得一个世界坐标系的视野矩形，用于排除视野之外的绘制，防止放大了之后会卡
+        from data_struct.rectangle import Rectangle
+        world_rect = Rectangle(
+            self.camera.location_view2world(NumberVector(0, 0)),
+            rect.width() / self.camera.current_scale,
+            rect.height() / self.camera.current_scale
+        )
 
         # 使用黑色填充整个窗口
         painter.fillRect(rect, Qt.black)
@@ -68,10 +75,12 @@ class Canvas(QWidget):
         paint_selected_rect(painter, self.camera, self.file_observer.dragging_entity)
         # 先画文件夹
         for folder_entity in self.file_observer.get_entity_folders():
-            paint_folder_rect(painter, self.camera, folder_entity)
+            if folder_entity.body_shape.is_collision(world_rect):
+                paint_folder_rect(painter, self.camera, folder_entity)
         # 后画文件
         for file_entity in self.file_observer.get_entity_files():
-            paint_file_rect(painter, self.camera, file_entity)
+            if file_entity.body_shape.is_collision(world_rect):
+                paint_file_rect(painter, self.camera, file_entity)
 
         # 画选中的框
         if self.file_observer.dragging_entity:
