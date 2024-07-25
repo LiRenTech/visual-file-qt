@@ -210,7 +210,7 @@ class EntityFolder(Entity):
 
 def sort_rectangle(rectangles: list[Rectangle], margin: float) -> list[Rectangle]:
     """
-    装箱问题，排列矩形
+    装箱问题，排序矩形
     :param rectangles: N个矩形的大小和位置
     :param margin: 矩形之间的间隔（为了美观考虑）
     :return: 调整好后的N个矩形的大小和位置，数组内每个矩形一一对应。
@@ -224,4 +224,56 @@ def sort_rectangle(rectangles: list[Rectangle], margin: float) -> list[Rectangle
     参数 margin = 2
     横向放置，减少了空间浪费。
     """
-    pass
+
+    def append_right(origin: Rectangle,
+                     rect: Rectangle,
+                     rects: list[Rectangle]) -> None:
+        rect.location_left_top.x = origin.right() + margin
+        rect.location_left_top.y = origin.top()
+        # 碰撞检测
+        collision = True
+        while collision:
+            collision = False
+            for r in rects:
+                if rect.is_collision(r):
+                    rect.location_left_top.y = r.bottom() + margin
+                    collision = True
+                    break
+
+    def append_bottom(origin: Rectangle,
+                      rect: Rectangle,
+                      rects: list[Rectangle]) -> None:
+        rect.location_left_top.y = origin.bottom() + margin
+        rect.location_left_top.x = origin.left()
+        # 碰撞检测
+        collision = True
+        while collision:
+            collision = False
+            for r in rects:
+                if rect.is_collision(r):
+                    rect.location_left_top.x = r.right() + margin
+                    collision = True
+                    break
+
+    rectangles[0].location_left_top.x = 0
+    rectangles[0].location_left_top.y = 0
+    ret = [rectangles[0]]
+    width = rectangles[0].width
+    height = rectangles[0].height
+    index = 0
+    for i in range(1, len(rectangles)):
+        if width < height:
+            append_right(rectangles[index], rectangles[i], ret)
+            w = rectangles[i].right()
+            if w > width:
+                width = w
+                index = i
+        else:
+            append_bottom(rectangles[index], rectangles[i], ret)
+            h = rectangles[i].bottom()
+            if h > height:
+                height = h
+                index = i
+        ret.append(rectangles[i])
+
+    return ret

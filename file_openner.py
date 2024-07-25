@@ -16,6 +16,10 @@ def open_file(full_path_file: str):
         #     pycharm_path = r"D:\Program Files\JetBrains\PyCharm Community Edition 2023.3.3\bin"
         #     subprocess.run([pycharm_path, full_path_file])
         #     return
-        os.startfile(full_path_file)
+        if os.name == "win32":
+            os.startfile(full_path_file)
+        else:
+            # linux 系统
+            os.system(f"xdg-open {full_path_file}")
     else:
         print("文件不存在！")
