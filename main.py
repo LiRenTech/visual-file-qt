@@ -26,7 +26,7 @@ class Canvas(QWidget):
         super().__init__()
 
         # 设置窗口标题和尺寸
-        self.setWindowTitle('Code Empire 代码帝国')
+        self.setWindowTitle('VisualFile 大型文件夹直观可视化工具')
         self.setGeometry(0, 0, 1920, 1080)
         # 设置窗口置顶
         self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
