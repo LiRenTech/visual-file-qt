@@ -51,12 +51,30 @@ def paint_details_data(paint: QPainter, camera: Camera):
     pass
 
 
+def paint_alert_message(paint: QPainter, camera: Camera, message: str):
+    """
+    屏幕中心绘制警告信息
+    :param paint:
+    :param camera:
+    :param message:
+    :return:
+    """
+
+    PainterUtils.paint_word_from_left_top(
+        paint,
+        NumberVector(camera.view_width / 2, camera.view_height / 2),
+        message,
+        24,
+        QColor(255, 255, 0, 255),
+    )
+
+
 def paint_rect_in_world(
-    paint: QPainter,
-    camera: Camera,
-    rect: Rectangle,
-    fill_color: QColor,
-    stroke_color: QColor,
+        paint: QPainter,
+        camera: Camera,
+        rect: Rectangle,
+        fill_color: QColor,
+        stroke_color: QColor,
 ):
     PainterUtils.paint_rect_from_left_top(
         paint,

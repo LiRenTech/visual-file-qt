@@ -15,6 +15,8 @@ class Rectangle:
         }
 
     def read_data(self, data: dict):
+        if "width" not in data or "height" not in data or "locationLeftTop" not in data:
+            raise ValueError("bodyShape 更新失败，缺少必要参数")
         self.width = data["width"]
         self.height = data["height"]
         self.location_left_top = NumberVector(
@@ -24,13 +26,13 @@ class Rectangle:
     def __contains__(self, item) -> bool:
         if isinstance(item, NumberVector):
             return (
-                self.location_left_top.x
-                <= item.x
-                <= self.location_left_top.x + self.width
+                    self.location_left_top.x
+                    <= item.x
+                    <= self.location_left_top.x + self.width
             ) and (
-                self.location_left_top.y
-                <= item.y
-                <= self.location_left_top.y + self.height
+                    self.location_left_top.y
+                    <= item.y
+                    <= self.location_left_top.y + self.height
             )
         else:
             return False

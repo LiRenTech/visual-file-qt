@@ -69,9 +69,8 @@ class EntityFolder(Entity):
             raise ValueError("读取的文件名不匹配", data["name"], self.folder_name)
         # 可以是先序遍历
         # 先更新内容
-        self.body_shape = self.body_shape.read_data(data["bodyShape"])
+        self.body_shape.read_data(data["bodyShape"])
         # ===
-        print(self.folder_name, self.full_path)
         for child in self.children:
             if isinstance(child, EntityFolder):
                 for data_child in data["children"]:

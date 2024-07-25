@@ -30,7 +30,7 @@ from paint.paint_elements import (
     paint_rect_in_world,
     paint_folder_rect,
     paint_details_data,
-    paint_selected_rect,
+    paint_selected_rect, paint_alert_message,
 )
 
 # READ_FOLDER = "D:/Projects/Project-Tools/CodeEmpire/test_file"
@@ -60,6 +60,8 @@ class Canvas(QMainWindow):
 
         # 窗口移动相关
         self._last_mouse_move_location = NumberVector.zero()  # 注意这是一个世界坐标
+        # 是否正在更新布局
+        self._is_updating_layout = False
 
     def init_ui(self):
         # 设置窗口标题和尺寸
@@ -145,7 +147,9 @@ class Canvas(QMainWindow):
 
             print(type(layout_dict), layout_dict)
             try:
+                self._is_updating_layout = True
                 self.file_observer.read_layout_dict(layout_dict)
+                self._is_updating_layout = False
             except Exception as e:
                 traceback.print_exc()
                 print(e)
@@ -178,17 +182,33 @@ class Canvas(QMainWindow):
         # 画网格
         paint_grid(painter, self.camera)
 
+        if self._is_updating_layout:
+            # 正在更新布局，绘制一个提醒
+            paint_alert_message(painter, self.camera, "正在更新文件夹内容，请稍后...")
+            return
         # 画场景物体
         # 绘制选中的浅色底层
         paint_selected_rect(painter, self.camera, self.file_observer.dragging_entity)
         # 先画文件夹
+        is_danger = False
         for folder_entity in self.file_observer.get_entity_folders():
-            if folder_entity.body_shape.is_collision(world_rect):
+            if not folder_entity.body_shape:
+                print(folder_entity)
+                print(f"warn!,[folder] {folder_entity.full_path} body shape is None")
+                is_danger = True
+                continue
+            if folder_entity.body_shape.is_collision(world_rect):  # bodyShape可能是None
                 paint_folder_rect(painter, self.camera, folder_entity)
         # 后画文件
         for file_entity in self.file_observer.get_entity_files():
+            if not file_entity.body_shape:
+                print(f"warn!,[file] {file_entity.full_path} body shape is None")
+                is_danger = True
+                continue
             if file_entity.body_shape.is_collision(world_rect):
                 paint_file_rect(painter, self.camera, file_entity)
+        if is_danger:
+            exit(1)
 
         # 画选中的框
         if self.file_observer.dragging_entity:
@@ -216,7 +236,7 @@ class Canvas(QMainWindow):
                     pass
                 self.file_observer.dragging_entity = entity
                 self.file_observer.dragging_offset = (
-                    point_world_location - entity.body_shape.location_left_top
+                        point_world_location - entity.body_shape.location_left_top
                 )
             else:
                 self.file_observer.dragging_entity = None
@@ -237,11 +257,11 @@ class Canvas(QMainWindow):
                 if self.file_observer.dragging_entity:
                     # 让它跟随鼠标移动
                     new_left_top = (
-                        point_world_location - self.file_observer.dragging_offset
+                            point_world_location - self.file_observer.dragging_offset
                     )
                     d_location = (
-                        new_left_top
-                        - self.file_observer.dragging_entity.body_shape.location_left_top
+                            new_left_top
+                            - self.file_observer.dragging_entity.body_shape.location_left_top
                     )
                     self.file_observer.dragging_entity.move(d_location)
             except Exception as e:

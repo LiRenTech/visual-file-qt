@@ -50,7 +50,9 @@ class FileObserver:
         :return:
         """
         # FIXME: 这里一下子就闪退了
+        print("开始读取布局文件")
         self.root_folder.read_data(layout_file["layout"][0])
+        print("读取布局文件完成")
         self.dragging_entity = None
 
     def _entity_files(self, folder: EntityFolder) -> list[EntityFile]:
