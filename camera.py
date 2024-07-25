@@ -17,7 +17,9 @@ class Camera:
     """
 
     def __init__(self, location: NumberVector, view_width: float, view_height: float):
+        # 相机位置，（世界位置）
         self.location = location
+
         # 最终的渲染框大小
         self.view_width = view_width
         self.view_height = view_height

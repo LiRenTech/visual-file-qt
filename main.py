@@ -43,6 +43,9 @@ class Canvas(QWidget):
         # 启动定时器
         self.timer.start()
 
+        # 窗口移动相关
+        self._last_mouse_move_location = NumberVector.zero()  # 注意这是一个世界坐标
+
     def tick(self):
         self.camera.tick()
         self.update()
@@ -91,6 +94,12 @@ class Canvas(QWidget):
                 self.file_observer.dragging_offset = point_world_location - entity.body_shape.location_left_top
             else:
                 self.file_observer.dragging_entity = None
+        elif event.button() == Qt.MiddleButton:
+            # 开始准备移动，记录好上一次鼠标位置的相差距离向量
+            self._last_mouse_move_location = self.camera.location_view2world(
+                NumberVector(event.pos().x(), event.pos().y())
+            )
+            pass
 
     def mouseMoveEvent(self, event: QMouseEvent):
         if event.buttons() == Qt.LeftButton:
@@ -110,6 +119,14 @@ class Canvas(QWidget):
                 print(e)
                 traceback.print_exc()
                 pass
+        if event.buttons() == Qt.MiddleButton:
+            # 移动的时候，应该记录与上一次鼠标位置的相差距离向量
+            current_mouse_move_location = self.camera.location_view2world(
+                NumberVector(event.pos().x(), event.pos().y())
+            )
+            diff_location = current_mouse_move_location - self._last_mouse_move_location
+            self.camera.location -= diff_location
+            print("middle button")
 
     def mouseReleaseEvent(self, event: QMouseEvent):
         if event.button() == Qt.LeftButton:

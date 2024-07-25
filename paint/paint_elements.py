@@ -33,7 +33,12 @@ def paint_grid(paint: QPainter, camera: Camera):
         print(e)
 
 
-def paint_rect_in_world(paint: QPainter, camera: Camera, rect: Rectangle, fill_color: QColor, stroke_color: QColor):
+def paint_rect_in_world(paint: QPainter,
+                        camera: Camera,
+                        rect: Rectangle,
+                        fill_color: QColor,
+                        stroke_color: QColor
+                        ):
     PainterUtils.paint_rect_from_left_top(
         paint,
         camera.location_world2view(rect.location_left_top),
@@ -67,6 +72,13 @@ def paint_file_rect(paint: QPainter, camera: Camera, entity_file: EntityFile):
 
 
 def paint_folder_rect(paint: QPainter, camera: Camera, entity_file: EntityFolder):
+    """
+
+    :param paint:
+    :param camera:
+    :param entity_file:
+    :return:
+    """
     # 先画一个框
     PainterUtils.paint_rect_from_left_top(
         paint,
