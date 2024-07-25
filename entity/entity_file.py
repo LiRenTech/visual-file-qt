@@ -31,3 +31,9 @@ class EntityFile(Entity):
 
         self.parent = parent  # parent是EntityFolder 但会循环引入，这里就没有写类型
         pass
+
+    def move(self, d_location: NumberVector):
+        super().move(d_location)
+        # 还要让父文件夹收缩调整
+        if self.parent:
+            self.parent.adjust()

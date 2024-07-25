@@ -37,6 +37,9 @@ class EntityFolder(Entity):
         # 还要，移动文件夹内所有实体
         for child in self.children:
             child.move(d_location)
+        # 还要让父文件夹收缩调整
+        if self.parent:
+            self.parent.adjust()
 
     def move_to(self, location_left_top: NumberVector):
         # 移动文件夹内所有实体
@@ -49,7 +52,7 @@ class EntityFolder(Entity):
 
     def update_tree_content(self):
         """
-        更新文件夹树结构内容，只读取
+        更新文件夹树结构内容，不更新显示位置大小
         但是是递归的
         :return:
         """
@@ -136,7 +139,7 @@ class EntityFolder(Entity):
         :return:
         """
 
-        # ===
+        # === 递归部分
         for child in folder.children:
             if isinstance(child, EntityFolder):
                 # 是文件夹，继续递归
@@ -147,21 +150,44 @@ class EntityFolder(Entity):
 
         # 调整当前文件夹里的所有实体顺序位置
         # 暂时采取竖着放的策略
+
         current_y = folder.body_shape.location_left_top.y + self.PADDING
         for child in folder.children:
             # 顶部对齐，不能直接修改位置来对齐，因为如果是一个文件夹，会导致它的子文件脱离了位置。
-            print("正在移动子文件或文件夹位置：", child.full_path)
             child.move_to(NumberVector(
                 folder.body_shape.location_left_top.x + self.PADDING,
                 current_y
             ))
             current_y += child.body_shape.height + self.PADDING
-            # child.adjust()  # 这一行可能有点多余
-            # 缩紧
+
+        # rectangle_list = [child.body_shape for child in folder.children]
+        # sorted_rectangle_list = sort_rectangle(rectangle_list, self.PADDING)
+        # for (i, child) in enumerate(folder.children):
+        #     child.move_to(sorted_rectangle_list[i].location_left_top)
+
         folder.adjust()
         pass
 
     def __repr__(self):
         return f"EntityFolder({self.full_path})"
 
+    pass
+
+
+def sort_rectangle(rectangles: list[Rectangle], margin: float) -> list[Rectangle]:
+    """
+    装箱问题，排列矩形
+    :param rectangles: N个矩形的大小和位置
+    :param margin: 矩形之间的间隔（为了美观考虑）
+    :return: 调整好后的N个矩形的大小和位置，数组内每个矩形一一对应。
+    例如：
+    rectangles = [Rectangle(NumberVector(0, 0), 10, 10), Rectangle(NumberVector(10, 10), 1, 1)]
+    这两个矩形对角放，外套矩形空隙面积过大，空间浪费，需要调整位置。
+
+    调整后返回：
+
+    [Rectangle(NumberVector(0, 0), 10, 10), Rectangle(NumberVector(12, 0), 1, 1)]
+    参数 margin = 2
+    横向放置，减少了空间浪费。
+    """
     pass

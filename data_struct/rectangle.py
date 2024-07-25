@@ -14,5 +14,16 @@ class Rectangle:
                     (self.location_left_top.y <= item.y <= self.location_left_top.y + self.height)
             )
         else:
-            # todo
             return False
+
+    def get_fore_points(self) -> list[NumberVector]:
+        return [
+            NumberVector(self.location_left_top.x, self.location_left_top.y),
+            NumberVector(self.location_left_top.x + self.width, self.location_left_top.y),
+            NumberVector(self.location_left_top.x + self.width, self.location_left_top.y + self.height),
+            NumberVector(self.location_left_top.x, self.location_left_top.y + self.height)
+        ]
+
+    def is_collision(self, rect: 'Rectangle') -> bool:
+        # TODO:
+        return False

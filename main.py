@@ -118,10 +118,6 @@ class Canvas(QWidget):
                     new_left_top = point_world_location - self.file_observer.dragging_offset
                     d_location = new_left_top - self.file_observer.dragging_entity.body_shape.location_left_top
                     self.file_observer.dragging_entity.move(d_location)
-
-                    if self.file_observer.dragging_entity.parent:
-                        # 由于可能拖动的是最外层文件夹，导致没有parent，所以加判断
-                        self.file_observer.dragging_entity.parent.adjust()
             except Exception as e:
                 print(e)
                 traceback.print_exc()
