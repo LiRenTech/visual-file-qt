@@ -3,6 +3,7 @@ from PyQt5.QtGui import QPainter, QColor
 from camera import Camera
 from data_struct.number_vector import NumberVector
 from data_struct.rectangle import Rectangle
+from entity.entity import Entity
 from entity.entity_file import EntityFile
 from entity.entity_folder import EntityFolder
 from paint.paint_utils import PainterUtils
@@ -89,6 +90,27 @@ def paint_file_rect(paint: QPainter, camera: Camera, entity_file: EntityFile):
     )
 
     pass
+
+
+def paint_selected_rect(paint: QPainter, camera: Camera, selected_entity: Entity):
+    """
+    绘制选中的区域
+    :param paint:
+    :param camera:
+    :param selected_entity:
+    :return:
+    """
+
+    if selected_entity is None:
+        return
+    PainterUtils.paint_rect_from_left_top(
+        paint,
+        camera.location_world2view(selected_entity.body_shape.location_left_top),
+        selected_entity.body_shape.width * camera.current_scale,
+        selected_entity.body_shape.height * camera.current_scale,
+        QColor(255, 0, 0, 100),
+        QColor(0, 0, 0, 0)
+    )
 
 
 def paint_folder_rect(paint: QPainter, camera: Camera, entity_file: EntityFolder):

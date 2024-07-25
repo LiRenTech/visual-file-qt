@@ -10,7 +10,8 @@ from entity.entity_file import EntityFile
 from entity.entity_folder import EntityFolder
 from file_observer import FileObserver
 from file_openner import open_file
-from paint.paint_elements import paint_grid, paint_file_rect, paint_rect_in_world, paint_folder_rect, paint_details_data
+from paint.paint_elements import paint_grid, paint_file_rect, paint_rect_in_world, paint_folder_rect, \
+    paint_details_data, paint_selected_rect
 
 # READ_FOLDER = "D:/Projects/Project-Tools/CodeEmpire/test_file"
 READ_FOLDER = "D:/Projects/Project-Tools/CodeEmpire"
@@ -60,6 +61,8 @@ class Canvas(QWidget):
         paint_grid(painter, self.camera)
 
         # 画场景物体
+        # 绘制选中的浅色底层
+        paint_selected_rect(painter, self.camera, self.file_observer.dragging_entity)
         # 先画文件夹
         for folder_entity in self.file_observer.get_entity_folders():
             paint_folder_rect(painter, self.camera, folder_entity)
