@@ -9,6 +9,8 @@ class Camera:
     frictionCoefficient = 0.1
 
     frictionExponent = 1.5
+
+    scaleExponent = 1.1  # 缩放指数，越大缩放速度越快
     """
     空气摩擦力速度指数
     指数=2，表示 f = -k * v^2
@@ -33,11 +35,21 @@ class Camera:
         self.accelerate = NumberVector(0, 0)
         # 可以看成一个九宫格，主要用于处理 w s a d 按键移动，
         self.accelerateCommander = NumberVector(0, 0)
+        self.is_scale_animation_open = True
 
     def reset(self):
         """外界调用，重置相机状态"""
         self.target_scale = 1.0
         self.location = NumberVector(0, 0)
+
+    def set_fast_mode(self):
+        self.scaleExponent = 1.5
+
+    def set_slow_mode(self):
+        self.scaleExponent = 1.1
+
+    def set_scale_animation(self, is_open: bool):
+        self.is_scale_animation_open = is_open
 
     def reset_view_size(self, view_width: float, view_height: float):
         """
@@ -65,10 +77,16 @@ class Camera:
         self.accelerateCommander = self.accelerateCommander.limit_y(-1, 1)
 
     def zoom_in(self):
-        self.target_scale *= 1.1
+        if self.is_scale_animation_open:
+            self.target_scale *= self.scaleExponent
+        else:
+            self.current_scale *= self.scaleExponent
 
     def zoom_out(self):
-        self.target_scale /= 1.1
+        if self.is_scale_animation_open:
+            self.target_scale /= self.scaleExponent
+        else:
+            self.current_scale /= self.scaleExponent
 
     def tick(self):
         try:
@@ -77,19 +95,20 @@ class Camera:
             if not self.speed.is_zero():
                 speed_size = self.speed.magnitude()
                 friction = (
-                        self.speed.normalize()
-                        * -1
-                        * (self.frictionCoefficient * speed_size ** self.frictionExponent)
+                    self.speed.normalize()
+                    * -1
+                    * (self.frictionCoefficient * speed_size**self.frictionExponent)
                 )
             self.speed += self.accelerateCommander * (
-                    self.moveAmplitude * (1 / self.current_scale)
+                self.moveAmplitude * (1 / self.current_scale)
             )
             self.speed += friction
 
             self.location += self.speed
 
             # 让 current_scale 逐渐靠近 target_scale
-            self.current_scale += (self.target_scale - self.current_scale) / 10
+            if self.is_scale_animation_open:
+                self.current_scale += (self.target_scale - self.current_scale) / 10
         except Exception as e:
             traceback.print_exc()
             print(e)
@@ -111,6 +130,6 @@ class Camera:
         :return:
         """
         v: NumberVector = (
-                                  view_location - NumberVector(self.view_width / 2, self.view_height / 2)
-                          ) / self.current_scale
+            view_location - NumberVector(self.view_width / 2, self.view_height / 2)
+        ) / self.current_scale
         return v + self.location

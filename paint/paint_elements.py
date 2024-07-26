@@ -80,11 +80,11 @@ def paint_alert_message(paint: QPainter, camera: Camera, message: str):
 
 
 def paint_rect_in_world(
-        paint: QPainter,
-        camera: Camera,
-        rect: Rectangle,
-        fill_color: QColor,
-        stroke_color: QColor,
+    paint: QPainter,
+    camera: Camera,
+    rect: Rectangle,
+    fill_color: QColor,
+    stroke_color: QColor,
 ):
     PainterUtils.paint_rect_from_left_top(
         paint,

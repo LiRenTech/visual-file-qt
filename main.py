@@ -30,7 +30,8 @@ from paint.paint_elements import (
     paint_rect_in_world,
     paint_folder_rect,
     paint_details_data,
-    paint_selected_rect, paint_alert_message,
+    paint_selected_rect,
+    paint_alert_message,
 )
 
 # READ_FOLDER = "D:/Projects/Project-Tools/CodeEmpire/test_file"
@@ -106,6 +107,31 @@ class Canvas(QMainWindow):
         view_menu.addAction(reset_action)
         reset_action.triggered.connect(self.on_reset_zoom)
 
+        # 创建 "快速档缩放" 菜单项
+        camera_fast_mode = QAction("快速档缩放", self)
+        camera_fast_mode.setShortcut("Ctrl++")
+        view_menu.addAction(camera_fast_mode)
+        camera_fast_mode.triggered.connect(lambda: self.camera.set_fast_mode())
+
+        camera_slow_mode = QAction("慢速档缩放", self)
+        camera_slow_mode.setShortcut("Ctrl+-")
+        view_menu.addAction(camera_slow_mode)
+        camera_slow_mode.triggered.connect(lambda: self.camera.set_slow_mode())
+
+        camera_open_animation = QAction("开启动画", self)
+
+        camera_open_animation.setShortcut("Ctrl+A")
+        view_menu.addAction(camera_open_animation)
+        camera_open_animation.triggered.connect(
+            lambda: self.camera.set_scale_animation(True)
+        )
+
+        camera_close_animation = QAction("关闭动画", self)
+        camera_close_animation.setShortcut("Ctrl+D")
+        view_menu.addAction(camera_close_animation)
+        camera_close_animation.triggered.connect(
+            lambda: self.camera.set_scale_animation(False)
+        )
         pass
 
     def on_open(self):
@@ -233,10 +259,7 @@ class Canvas(QMainWindow):
             )
         # 绘制细节信息
         paint_details_data(
-            painter, self.camera,
-            [
-                f"{self.file_observer.root_folder.full_path}"
-            ]
+            painter, self.camera, [f"{self.file_observer.root_folder.full_path}"]
         )
 
     def mousePressEvent(self, event: QMouseEvent):
@@ -253,7 +276,7 @@ class Canvas(QMainWindow):
                     pass
                 self.file_observer.dragging_entity = entity
                 self.file_observer.dragging_offset = (
-                        point_world_location - entity.body_shape.location_left_top
+                    point_world_location - entity.body_shape.location_left_top
                 )
             else:
                 self.file_observer.dragging_entity = None
@@ -274,11 +297,11 @@ class Canvas(QMainWindow):
                 if self.file_observer.dragging_entity:
                     # 让它跟随鼠标移动
                     new_left_top = (
-                            point_world_location - self.file_observer.dragging_offset
+                        point_world_location - self.file_observer.dragging_offset
                     )
                     d_location = (
-                            new_left_top
-                            - self.file_observer.dragging_entity.body_shape.location_left_top
+                        new_left_top
+                        - self.file_observer.dragging_entity.body_shape.location_left_top
                     )
                     self.file_observer.dragging_entity.move(d_location)
             except Exception as e:
