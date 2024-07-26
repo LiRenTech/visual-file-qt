@@ -26,13 +26,13 @@ class Rectangle:
     def __contains__(self, item) -> bool:
         if isinstance(item, NumberVector):
             return (
-                self.location_left_top.x
-                <= item.x
-                <= self.location_left_top.x + self.width
+                    self.location_left_top.x
+                    <= item.x
+                    <= self.location_left_top.x + self.width
             ) and (
-                self.location_left_top.y
-                <= item.y
-                <= self.location_left_top.y + self.height
+                    self.location_left_top.y
+                    <= item.y
+                    <= self.location_left_top.y + self.height
             )
         else:
             return False
@@ -80,6 +80,18 @@ class Rectangle:
         collision_x = self.right() >= rect.left() and rect.right() >= self.left()
         collision_y = self.bottom() >= rect.top() and rect.bottom() >= self.top()
         return collision_x and collision_y
+
+    def is_contain(self, rect: "Rectangle") -> bool:
+        """判断是否包含另一个矩形，另一个矩形是否被套在自己内部"""
+        return (
+                self.left() <= rect.left()
+                and self.right() >= rect.right()
+                and self.top() <= rect.top()
+                and self.bottom() >= rect.bottom()
+        )
+
+    def __repr__(self):
+        return f"Rectangle({self.location_left_top}, {self.width}, {self.height})"
 
 
 # test

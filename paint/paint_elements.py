@@ -121,12 +121,13 @@ def paint_file_rect(paint: QPainter, camera: Camera, entity_file: EntityFile):
     pass
 
 
-def paint_selected_rect(paint: QPainter, camera: Camera, selected_entity: Entity):
+def paint_selected_rect(paint: QPainter, camera: Camera, selected_entity: Entity, is_active: bool):
     """
     绘制选中的区域
     :param paint:
     :param camera:
     :param selected_entity:
+    :param is_active: 如果是激活状态，绘制填充颜色，否则绘制边框颜色
     :return:
     """
 
@@ -137,8 +138,8 @@ def paint_selected_rect(paint: QPainter, camera: Camera, selected_entity: Entity
         camera.location_world2view(selected_entity.body_shape.location_left_top),
         selected_entity.body_shape.width * camera.current_scale,
         selected_entity.body_shape.height * camera.current_scale,
-        QColor(255, 0, 0, 100),
-        QColor(0, 0, 0, 0),
+        QColor(255, 0, 0, 100) if is_active else QColor(0, 0, 0, 0),
+        QColor(0, 0, 0, 0) if is_active else QColor(255, 0, 0, 255),
     )
 
 

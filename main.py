@@ -33,6 +33,7 @@ from paint.paint_elements import (
     paint_selected_rect,
     paint_alert_message,
 )
+from paint.paint_utils import PainterUtils
 
 # READ_FOLDER = "D:/Projects/Project-Tools/CodeEmpire/test_file"
 READ_FOLDER = "D:/Projects/Project-Tools/CodeEmpire"
@@ -197,6 +198,20 @@ class Canvas(QMainWindow):
 
     def tick(self):
         self.camera.tick()
+        if self.file_observer.dragging_entity:
+            # 对比当前选中的实体矩形和视野矩形
+            if self.camera.cover_world_rectangle.is_contain(
+                self.file_observer.dragging_entity.body_shape
+            ):
+                # 套住了
+                self.file_observer.dragging_entity_activating = True
+                pass
+            else:
+                # 没套住
+                self.file_observer.dragging_entity_activating = False
+                pass
+            pass
+        # 重绘窗口
         self.update()
 
     def paintEvent(self, event):
@@ -207,13 +222,14 @@ class Canvas(QMainWindow):
         # 更新camera大小，防止放大窗口后缩放中心点还在左上部分
         self.camera.reset_view_size(rect.width(), rect.height())
         # 获得一个世界坐标系的视野矩形，用于排除视野之外的绘制，防止放大了之后会卡
-        from data_struct.rectangle import Rectangle
-
-        world_rect = Rectangle(
-            self.camera.location_view2world(NumberVector(0, 0)),
-            rect.width() / self.camera.current_scale,
-            rect.height() / self.camera.current_scale,
-        )
+        # PainterUtils.paint_rect_from_left_top(
+        #     painter,
+        #     self.camera.cover_world_rectangle.location_left_top,
+        #     self.camera.cover_world_rectangle.width,
+        #     self.camera.cover_world_rectangle.height,
+        #     QColor(255, 128, 10, 100),
+        #     QColor(255, 128, 10, 100),
+        # )
 
         # 使用黑色填充整个窗口
         painter.fillRect(rect, QColor(0, 0, 0, 255))
@@ -225,8 +241,13 @@ class Canvas(QMainWindow):
             paint_alert_message(painter, self.camera, "正在更新文件夹内容，请稍后...")
             return
         # 画场景物体
-        # 绘制选中的浅色底层
-        paint_selected_rect(painter, self.camera, self.file_observer.dragging_entity)
+        # 绘制选中的区域
+        paint_selected_rect(
+            painter,
+            self.camera,
+            self.file_observer.dragging_entity,
+            self.file_observer.dragging_entity_activating
+        )
         # 先画文件夹
         is_danger = False
         for folder_entity in self.file_observer.get_entity_folders():
@@ -235,7 +256,7 @@ class Canvas(QMainWindow):
                 print(f"warn!,[folder] {folder_entity.full_path} body shape is None")
                 is_danger = True
                 continue
-            if folder_entity.body_shape.is_collision(world_rect):  # bodyShape可能是None
+            if folder_entity.body_shape.is_collision(self.camera.cover_world_rectangle):  # bodyShape可能是None
                 paint_folder_rect(painter, self.camera, folder_entity)
         # 后画文件
         for file_entity in self.file_observer.get_entity_files():
@@ -243,7 +264,7 @@ class Canvas(QMainWindow):
                 print(f"warn!,[file] {file_entity.full_path} body shape is None")
                 is_danger = True
                 continue
-            if file_entity.body_shape.is_collision(world_rect):
+            if file_entity.body_shape.is_collision(self.camera.cover_world_rectangle):
                 paint_file_rect(painter, self.camera, file_entity)
         if is_danger:
             exit(1)
@@ -289,12 +310,16 @@ class Canvas(QMainWindow):
 
     def mouseMoveEvent(self, event: QMouseEvent):
         if event.buttons() == Qt.LeftButton:
+            # 左键拖拽，但要看看是否是激活状态
             try:
                 point_view_location = NumberVector(event.pos().x(), event.pos().y())
                 point_world_location = self.camera.location_view2world(
                     point_view_location
                 )
                 if self.file_observer.dragging_entity:
+                    if not self.file_observer.dragging_entity_activating:
+                        # 不是一个激活的状态 就不动了
+                        return
                     # 让它跟随鼠标移动
                     new_left_top = (
                         point_world_location - self.file_observer.dragging_offset

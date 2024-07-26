@@ -23,6 +23,8 @@ class FileObserver:
         self.dragging_entity: EntityFile | EntityFolder | None = None
         # 拖拽点相对于原点的偏移
         self.dragging_offset: NumberVector = NumberVector(0, 0)
+        # 当前选中的实体是否是激活状态
+        self.dragging_entity_activating: bool = True
 
     def update_file_path(self, new_path: str):
         """

@@ -1,6 +1,8 @@
 from data_struct.number_vector import NumberVector
 import traceback
 
+from data_struct.rectangle import Rectangle
+
 
 class Camera:
     # 每个方向上的动力矢量大小
@@ -22,7 +24,7 @@ class Camera:
         # 相机位置，（世界位置）
         self.location = location
 
-        # 最终的渲染框大小
+        # 最终的渲染框大小，这两个是在屏幕上的渲染宽度
         self.view_width = view_width
         self.view_height = view_height
 
@@ -95,12 +97,12 @@ class Camera:
             if not self.speed.is_zero():
                 speed_size = self.speed.magnitude()
                 friction = (
-                    self.speed.normalize()
-                    * -1
-                    * (self.frictionCoefficient * speed_size**self.frictionExponent)
+                        self.speed.normalize()
+                        * -1
+                        * (self.frictionCoefficient * speed_size ** self.frictionExponent)
                 )
             self.speed += self.accelerateCommander * (
-                self.moveAmplitude * (1 / self.current_scale)
+                    self.moveAmplitude * (1 / self.current_scale)
             )
             self.speed += friction
 
@@ -112,6 +114,24 @@ class Camera:
         except Exception as e:
             traceback.print_exc()
             print(e)
+
+    @property
+    def cover_world_rectangle(self) -> Rectangle:
+        """
+        获取摄像机视野范围内所覆盖住的世界范围矩形
+        :return: 返回的矩形是世界坐标下的矩形
+        """
+        width = self.view_width / self.current_scale
+        height = self.view_height / self.current_scale
+
+        return Rectangle(
+            NumberVector(
+                self.location.x - width / 2,
+                self.location.y - height / 2,
+            ),
+            width,
+            height,
+        )
 
     def location_world2view(self, world_location: NumberVector) -> NumberVector:
         """
@@ -130,6 +150,6 @@ class Camera:
         :return:
         """
         v: NumberVector = (
-            view_location - NumberVector(self.view_width / 2, self.view_height / 2)
-        ) / self.current_scale
+                                  view_location - NumberVector(self.view_width / 2, self.view_height / 2)
+                          ) / self.current_scale
         return v + self.location
