@@ -16,7 +16,8 @@ def open_file(full_path_file: str):
         #     pycharm_path = r"D:\Program Files\JetBrains\PyCharm Community Edition 2023.3.3\bin"
         #     subprocess.run([pycharm_path, full_path_file])
         #     return
-        if os.name == "win32":
+        print("当前系统：", os.name)
+        if os.name == "win32" or os.name == "nt":
             os.startfile(full_path_file)
         else:
             # linux 系统

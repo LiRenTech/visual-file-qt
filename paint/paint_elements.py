@@ -138,8 +138,8 @@ def paint_selected_rect(paint: QPainter, camera: Camera, selected_entity: Entity
         camera.location_world2view(selected_entity.body_shape.location_left_top),
         selected_entity.body_shape.width * camera.current_scale,
         selected_entity.body_shape.height * camera.current_scale,
-        QColor(255, 0, 0, 100) if is_active else QColor(0, 0, 0, 0),
-        QColor(0, 0, 0, 0) if is_active else QColor(255, 0, 0, 255),
+        QColor(89, 158, 94, 100) if is_active else QColor(0, 0, 0, 0),
+        QColor(0, 255, 0, 255) if is_active else QColor(255, 0, 0, 255),
     )
 
 

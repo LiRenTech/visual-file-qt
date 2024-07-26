@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (
     QDesktopWidget,
     QAction,
     QMainWindow,
-    QFileDialog,
+    QFileDialog, QMessageBox,
 )
 from PyQt5.QtGui import QPainter, QMouseEvent, QWheelEvent, QKeyEvent, QColor, QIcon
 from PyQt5.QtCore import Qt, QTimer
@@ -133,7 +133,26 @@ class Canvas(QMainWindow):
         camera_close_animation.triggered.connect(
             lambda: self.camera.set_scale_animation(False)
         )
+
+        # 创建帮助说明菜单项
+        help_menu = menubar.addMenu("Help")
+        help_action = QAction("帮助说明", self)
+        help_action.setShortcut("Ctrl+H")
+        help_menu.addAction(help_action)
+        help_action.triggered.connect(self.on_help)
+
         pass
+
+    def on_help(self):
+        # 创建一个消息框
+        msgBox = QMessageBox()
+        msgBox.setIcon(QMessageBox.Information)
+        msgBox.setWindowTitle("visual-file 帮助说明")
+        msgBox.setText("点击某矩形拖拽\n双击矩形：打开对应文件\n鼠标中键或者WSAD：移动视野\n鼠标滚轮：缩放视野\n")
+        msgBox.setStandardButtons(QMessageBox.Ok)
+
+        # 显示消息框
+        msgBox.exec_()
 
     def on_open(self):
         # 直接读取文件
@@ -201,7 +220,7 @@ class Canvas(QMainWindow):
         if self.file_observer.dragging_entity:
             # 对比当前选中的实体矩形和视野矩形
             if self.camera.cover_world_rectangle.is_contain(
-                self.file_observer.dragging_entity.body_shape
+                    self.file_observer.dragging_entity.body_shape
             ):
                 # 套住了
                 self.file_observer.dragging_entity_activating = True
@@ -221,15 +240,6 @@ class Canvas(QMainWindow):
         rect = self.rect()
         # 更新camera大小，防止放大窗口后缩放中心点还在左上部分
         self.camera.reset_view_size(rect.width(), rect.height())
-        # 获得一个世界坐标系的视野矩形，用于排除视野之外的绘制，防止放大了之后会卡
-        # PainterUtils.paint_rect_from_left_top(
-        #     painter,
-        #     self.camera.cover_world_rectangle.location_left_top,
-        #     self.camera.cover_world_rectangle.width,
-        #     self.camera.cover_world_rectangle.height,
-        #     QColor(255, 128, 10, 100),
-        #     QColor(255, 128, 10, 100),
-        # )
 
         # 使用黑色填充整个窗口
         painter.fillRect(rect, QColor(0, 0, 0, 255))
@@ -241,13 +251,7 @@ class Canvas(QMainWindow):
             paint_alert_message(painter, self.camera, "正在更新文件夹内容，请稍后...")
             return
         # 画场景物体
-        # 绘制选中的区域
-        paint_selected_rect(
-            painter,
-            self.camera,
-            self.file_observer.dragging_entity,
-            self.file_observer.dragging_entity_activating
-        )
+
         # 先画文件夹
         is_danger = False
         for folder_entity in self.file_observer.get_entity_folders():
@@ -257,6 +261,7 @@ class Canvas(QMainWindow):
                 is_danger = True
                 continue
             if folder_entity.body_shape.is_collision(self.camera.cover_world_rectangle):  # bodyShape可能是None
+                # 获得一个世界坐标系的视野矩形，用于排除视野之外的绘制，防止放大了之后会卡
                 paint_folder_rect(painter, self.camera, folder_entity)
         # 后画文件
         for file_entity in self.file_observer.get_entity_files():
@@ -268,16 +273,13 @@ class Canvas(QMainWindow):
                 paint_file_rect(painter, self.camera, file_entity)
         if is_danger:
             exit(1)
-
-        # 画选中的框
-        if self.file_observer.dragging_entity:
-            paint_rect_in_world(
-                painter,
-                self.camera,
-                self.file_observer.dragging_entity.body_shape,
-                QColor(0, 0, 0, 0),
-                QColor(255, 0, 0),
-            )
+        # 绘制选中的区域
+        paint_selected_rect(
+            painter,
+            self.camera,
+            self.file_observer.dragging_entity,
+            self.file_observer.dragging_entity_activating
+        )
         # 绘制细节信息
         paint_details_data(
             painter, self.camera, [f"{self.file_observer.root_folder.full_path}"]
@@ -290,6 +292,7 @@ class Canvas(QMainWindow):
             point_world_location = self.camera.location_view2world(point_view_location)
             entity = self.file_observer.get_entity_by_location(point_world_location)
             if entity:
+
                 # 让它吸附在鼠标上
                 if isinstance(entity, EntityFile):
                     pass
@@ -297,7 +300,7 @@ class Canvas(QMainWindow):
                     pass
                 self.file_observer.dragging_entity = entity
                 self.file_observer.dragging_offset = (
-                    point_world_location - entity.body_shape.location_left_top
+                        point_world_location - entity.body_shape.location_left_top
                 )
             else:
                 self.file_observer.dragging_entity = None
@@ -322,11 +325,11 @@ class Canvas(QMainWindow):
                         return
                     # 让它跟随鼠标移动
                     new_left_top = (
-                        point_world_location - self.file_observer.dragging_offset
+                            point_world_location - self.file_observer.dragging_offset
                     )
                     d_location = (
-                        new_left_top
-                        - self.file_observer.dragging_entity.body_shape.location_left_top
+                            new_left_top
+                            - self.file_observer.dragging_entity.body_shape.location_left_top
                     )
                     self.file_observer.dragging_entity.move(d_location)
             except Exception as e:
