@@ -34,20 +34,30 @@ def paint_grid(paint: QPainter, camera: Camera):
         print(e)
 
 
-def paint_details_data(paint: QPainter, camera: Camera):
+def paint_details_data(paint: QPainter, camera: Camera, datas: list[str]):
     """
     左上角绘制细节信息
     :param paint:
     :param camera:
+    :param datas:
     :return:
     """
+    start_y = 100
     PainterUtils.paint_word_from_left_top(
         paint,
-        NumberVector(0, 10),  # 左上角坐标
-        f"camera scale: {camera.current_scale:.2f}",
+        NumberVector(0, 50),  # 左上角坐标
+        f"camera scale: {camera.current_scale:.2f} location: {camera.location}",
         12,
         QColor(255, 255, 255, 100),
     )
+    for i, data in enumerate(datas):
+        PainterUtils.paint_word_from_left_top(
+            paint,
+            NumberVector(0, start_y + i * 20),
+            data,
+            12,
+            QColor(255, 255, 255, 100),
+        )
     pass
 
 

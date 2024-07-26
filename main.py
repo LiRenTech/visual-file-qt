@@ -97,6 +97,15 @@ class Canvas(QMainWindow):
         import_action.setShortcut("Ctrl+I")
         file_menu.addAction(import_action)
         import_action.triggered.connect(self.on_import)
+
+        # "View" 菜单
+        view_menu = menubar.addMenu("View")
+        # 创建 "Reset" 菜单项
+        reset_action = QAction("重置缩放", self)
+        reset_action.setShortcut("Ctrl+0")
+        view_menu.addAction(reset_action)
+        reset_action.triggered.connect(self.on_reset_zoom)
+
         pass
 
     def on_open(self):
@@ -156,6 +165,9 @@ class Canvas(QMainWindow):
         else:
             # 如果用户取消了打开操作
             print("Import operation cancelled.")
+
+    def on_reset_zoom(self):
+        self.camera.reset()
 
     def tick(self):
         self.camera.tick()
@@ -220,7 +232,12 @@ class Canvas(QMainWindow):
                 QColor(255, 0, 0),
             )
         # 绘制细节信息
-        paint_details_data(painter, self.camera)
+        paint_details_data(
+            painter, self.camera,
+            [
+                f"{self.file_observer.root_folder.full_path}"
+            ]
+        )
 
     def mousePressEvent(self, event: QMouseEvent):
         if event.button() == Qt.LeftButton:

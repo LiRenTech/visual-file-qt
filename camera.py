@@ -34,6 +34,11 @@ class Camera:
         # 可以看成一个九宫格，主要用于处理 w s a d 按键移动，
         self.accelerateCommander = NumberVector(0, 0)
 
+    def reset(self):
+        """外界调用，重置相机状态"""
+        self.target_scale = 1.0
+        self.location = NumberVector(0, 0)
+
     def reset_view_size(self, view_width: float, view_height: float):
         """
         由于外层渲染区域大小发生变化，需要重新设置相机视野大小
@@ -72,12 +77,12 @@ class Camera:
             if not self.speed.is_zero():
                 speed_size = self.speed.magnitude()
                 friction = (
-                    self.speed.normalize()
-                    * -1
-                    * (self.frictionCoefficient * speed_size**self.frictionExponent)
+                        self.speed.normalize()
+                        * -1
+                        * (self.frictionCoefficient * speed_size ** self.frictionExponent)
                 )
             self.speed += self.accelerateCommander * (
-                self.moveAmplitude * (1 / self.current_scale)
+                    self.moveAmplitude * (1 / self.current_scale)
             )
             self.speed += friction
 
@@ -106,6 +111,6 @@ class Camera:
         :return:
         """
         v: NumberVector = (
-            view_location - NumberVector(self.view_width / 2, self.view_height / 2)
-        ) / self.current_scale
+                                  view_location - NumberVector(self.view_width / 2, self.view_height / 2)
+                          ) / self.current_scale
         return v + self.location
