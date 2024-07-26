@@ -34,14 +34,6 @@ from paint.paint_elements import (
     paint_selected_rect,
     paint_alert_message,
 )
-from paint.paint_utils import PainterUtils
-
-# READ_FOLDER = "D:/Projects/Project-Tools/CodeEmpire/test_file"
-READ_FOLDER = "D:/Projects/Project-Tools/CodeEmpire"
-READ_FOLDER = r"D:\Projects\Project-CannonWar\CannonWar-v2\src"
-
-
-# READ_FOLDER = "D:/Desktop/test"
 
 
 class Canvas(QMainWindow):
@@ -52,7 +44,7 @@ class Canvas(QMainWindow):
 
         # 重要对象绑定
         self.camera = Camera(NumberVector.zero(), 1920, 1080)
-        self.file_observer = FileObserver(READ_FOLDER)
+        self.file_observer = FileObserver()
 
         # 创建一个定时器用于定期更新窗口
         self.timer = QTimer(self)
@@ -167,7 +159,8 @@ class Canvas(QMainWindow):
         window_top_left = screen_center - window_center
         self.move(window_top_left)
 
-    def on_help(self):
+    @staticmethod
+    def on_help():
         # 创建一个消息框
         msgBox = QMessageBox()
         msgBox.setWindowIcon(QIcon(":/favicon.ico"))
@@ -212,6 +205,7 @@ class Canvas(QMainWindow):
 
     def on_update(self):
         # 更新文件夹内容
+        # TODO:
         print("更新文件")
         pass
 
@@ -314,7 +308,7 @@ class Canvas(QMainWindow):
             painter,
             self.camera,
             [
-                f"{self.file_observer.root_folder.full_path}",
+                f"{self.file_observer.root_folder.full_path if self.file_observer.root_folder else 'no root folder'}",
                 f"drag locked: {self.file_observer.is_drag_locked}",
             ],
         )
