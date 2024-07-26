@@ -7,7 +7,8 @@ from PyQt5.QtWidgets import (
     QDesktopWidget,
     QAction,
     QMainWindow,
-    QFileDialog, QMessageBox,
+    QFileDialog,
+    QMessageBox,
 )
 from PyQt5.QtGui import QPainter, QMouseEvent, QWheelEvent, QKeyEvent, QColor, QIcon
 from PyQt5.QtCore import Qt, QTimer, QPoint
@@ -121,7 +122,6 @@ class Canvas(QMainWindow):
         camera_slow_mode.triggered.connect(lambda: self.camera.set_slow_mode())
 
         camera_open_animation = QAction("开启动画", self)
-
         camera_open_animation.setShortcut("Ctrl+A")
         view_menu.addAction(camera_open_animation)
         camera_open_animation.triggered.connect(
@@ -134,6 +134,16 @@ class Canvas(QMainWindow):
         camera_close_animation.triggered.connect(
             lambda: self.camera.set_scale_animation(False)
         )
+
+        drag_lock = QAction("锁定拖拽", self)
+        drag_lock.setShortcut("Ctrl+L")
+        view_menu.addAction(drag_lock)
+        drag_lock.triggered.connect(lambda: self.file_observer.set_drag_lock(True))
+
+        drag_unlock = QAction("解锁拖拽", self)
+        drag_unlock.setShortcut("Ctrl+U")
+        view_menu.addAction(drag_unlock)
+        drag_unlock.triggered.connect(lambda: self.file_observer.set_drag_lock(False))
 
         # 创建帮助说明菜单项
         help_menu = menubar.addMenu("Help")
@@ -160,9 +170,12 @@ class Canvas(QMainWindow):
     def on_help(self):
         # 创建一个消息框
         msgBox = QMessageBox()
+        msgBox.setWindowIcon(QIcon(":/favicon.ico"))
         msgBox.setIcon(QMessageBox.Information)
         msgBox.setWindowTitle("visual-file 帮助说明")
-        msgBox.setText("点击某矩形拖拽\n双击矩形：打开对应文件\n鼠标中键或者WSAD：移动视野\n鼠标滚轮：缩放视野\n")
+        msgBox.setText(
+            "点击某矩形拖拽\n双击矩形：打开对应文件\n鼠标中键或者WSAD：移动视野\n鼠标滚轮：缩放视野\n"
+        )
         msgBox.setStandardButtons(QMessageBox.Ok)
 
         # 显示消息框
@@ -234,7 +247,7 @@ class Canvas(QMainWindow):
         if self.file_observer.dragging_entity:
             # 对比当前选中的实体矩形和视野矩形
             if self.camera.cover_world_rectangle.is_contain(
-                    self.file_observer.dragging_entity.body_shape
+                self.file_observer.dragging_entity.body_shape
             ):
                 # 套住了
                 self.file_observer.dragging_entity_activating = True
@@ -274,7 +287,9 @@ class Canvas(QMainWindow):
                 print(f"warn!,[folder] {folder_entity.full_path} body shape is None")
                 is_danger = True
                 continue
-            if folder_entity.body_shape.is_collision(self.camera.cover_world_rectangle):  # bodyShape可能是None
+            if folder_entity.body_shape.is_collision(
+                self.camera.cover_world_rectangle
+            ):  # bodyShape可能是None
                 # 获得一个世界坐标系的视野矩形，用于排除视野之外的绘制，防止放大了之后会卡
                 paint_folder_rect(painter, self.camera, folder_entity)
         # 后画文件
@@ -292,16 +307,20 @@ class Canvas(QMainWindow):
             painter,
             self.camera,
             self.file_observer.dragging_entity,
-            self.file_observer.dragging_entity_activating
+            self.file_observer.dragging_entity_activating,
         )
         # 绘制细节信息
         paint_details_data(
-            painter, self.camera, [f"{self.file_observer.root_folder.full_path}"]
+            painter,
+            self.camera,
+            [
+                f"{self.file_observer.root_folder.full_path}",
+                f"drag locked: {self.file_observer.is_drag_locked}",
+            ],
         )
 
     def mousePressEvent(self, event: QMouseEvent):
         if event.button() == Qt.LeftButton:
-
             point_view_location = NumberVector(event.pos().x(), event.pos().y())
             point_world_location = self.camera.location_view2world(point_view_location)
             entity = self.file_observer.get_entity_by_location(point_world_location)
@@ -314,7 +333,7 @@ class Canvas(QMainWindow):
                     pass
                 self.file_observer.dragging_entity = entity
                 self.file_observer.dragging_offset = (
-                        point_world_location - entity.body_shape.location_left_top
+                    point_world_location - entity.body_shape.location_left_top
                 )
             else:
                 self.file_observer.dragging_entity = None
@@ -327,6 +346,8 @@ class Canvas(QMainWindow):
 
     def mouseMoveEvent(self, event: QMouseEvent):
         if event.buttons() == Qt.LeftButton:
+            if self.file_observer.is_drag_locked:
+                return
             # 左键拖拽，但要看看是否是激活状态
             try:
                 point_view_location = NumberVector(event.pos().x(), event.pos().y())
@@ -339,11 +360,11 @@ class Canvas(QMainWindow):
                         return
                     # 让它跟随鼠标移动
                     new_left_top = (
-                            point_world_location - self.file_observer.dragging_offset
+                        point_world_location - self.file_observer.dragging_offset
                     )
                     d_location = (
-                            new_left_top
-                            - self.file_observer.dragging_entity.body_shape.location_left_top
+                        new_left_top
+                        - self.file_observer.dragging_entity.body_shape.location_left_top
                     )
                     self.file_observer.dragging_entity.move(d_location)
             except Exception as e:
@@ -360,6 +381,8 @@ class Canvas(QMainWindow):
 
     def mouseReleaseEvent(self, event: QMouseEvent):
         if event.button() == Qt.LeftButton:
+            if self.file_observer.is_drag_locked:
+                return
             point_view_location = NumberVector(event.pos().x(), event.pos().y())
             point_world_location = self.camera.location_view2world(point_view_location)
             entity = self.file_observer.get_entity_by_location(point_world_location)

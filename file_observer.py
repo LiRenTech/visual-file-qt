@@ -25,6 +25,13 @@ class FileObserver:
         self.dragging_offset: NumberVector = NumberVector(0, 0)
         # 当前选中的实体是否是激活状态
         self.dragging_entity_activating: bool = True
+        # 是否锁定拖拽
+        self.is_drag_locked: bool = False
+
+    def set_drag_lock(self, is_lock: bool):
+        self.is_drag_locked = is_lock
+        if is_lock:
+            self.dragging_entity_activating = False
 
     def update_file_path(self, new_path: str):
         """

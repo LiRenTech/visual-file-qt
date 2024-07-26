@@ -53,7 +53,7 @@ def paint_details_data(paint: QPainter, camera: Camera, datas: list[str]):
     for i, data in enumerate(datas):
         PainterUtils.paint_word_from_left_top(
             paint,
-            NumberVector(0, start_y + i * 20),
+            NumberVector(0, start_y + i * 50),
             data,
             12,
             QColor(255, 255, 255, 100),
@@ -121,7 +121,9 @@ def paint_file_rect(paint: QPainter, camera: Camera, entity_file: EntityFile):
     pass
 
 
-def paint_selected_rect(paint: QPainter, camera: Camera, selected_entity: Entity, is_active: bool):
+def paint_selected_rect(
+    paint: QPainter, camera: Camera, selected_entity: Entity, is_active: bool
+):
     """
     绘制选中的区域
     :param paint:
