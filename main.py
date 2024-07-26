@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (
     QFileDialog, QMessageBox,
 )
 from PyQt5.QtGui import QPainter, QMouseEvent, QWheelEvent, QKeyEvent, QColor, QIcon
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import Qt, QTimer, QPoint
 
 from assets import assets
 
@@ -71,6 +71,7 @@ class Canvas(QMainWindow):
 
         self.setGeometry(0, 0, 1920, 1080)
         self.setWindowIcon(QIcon(":/favicon.ico"))
+        self._move_window_to_center()
 
         # 创建菜单栏
         menubar = self.menuBar()
@@ -142,6 +143,19 @@ class Canvas(QMainWindow):
         help_action.triggered.connect(self.on_help)
 
         pass
+
+    def _move_window_to_center(self):
+        # 获取屏幕的尺寸和中心位置
+        screen = QDesktopWidget().screenGeometry()
+        screen_center = screen.center()
+
+        # 计算窗口的中心位置
+        window_size = self.geometry().size()
+        window_center = QPoint(window_size.width() // 2, window_size.height() // 2)
+
+        # 计算窗口的左上角位置以使其居中
+        window_top_left = screen_center - window_center
+        self.move(window_top_left)
 
     def on_help(self):
         # 创建一个消息框
