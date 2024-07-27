@@ -141,12 +141,30 @@ class EntityFolder(Entity):
         # 移动文件夹本身
         super().move_to(location_left_top)
 
+    def _is_have_child(self, child_name: str):
+        """
+        判断自身文件夹内部第一层是否含有某个子文件或文件夹
+        :param child_name:
+        :return:
+        """
+        for child in self.children:
+            if isinstance(child, EntityFolder):
+                if child.folder_name == child_name:
+                    return True
+            elif isinstance(child, EntityFile):
+                if child.file_name == child_name:
+                    return True
+            else:
+                raise ValueError("子节点类型错误", child)
+        return False
+
     def update_tree_content(self):
         """
         更新文件夹树结构内容，不更新显示位置大小
         但是是递归的
         :return:
         """
+
         import os
 
         # 如果是一个文件夹，往右放
@@ -157,20 +175,35 @@ class EntityFolder(Entity):
 
         for file_name_sub in os.listdir(self.full_path):
             full_path_sub = os.path.join(self.full_path, file_name_sub)
+            is_have = self._is_have_child(file_name_sub)
+
+            # 开始添加
             if os.path.isdir(full_path_sub):
                 # 排除的文件夹名字
                 if file_name_sub in self.exclusion_list:
                     continue
+                if is_have:
+                    # 还要继续深入检查这个文件夹内部是否有更新
+                    for chile in self.children:
+                        if (
+                            isinstance(chile, EntityFolder)
+                            and chile.folder_name == file_name_sub
+                        ):
+                            # 找到这个原有的子文件夹并递归下去
+                            chile.update_tree_content()
+                            break
+                else:
+                    # 新增了一个文件夹
+                    child_folder = EntityFolder(put_location, full_path_sub)
+                    put_location += NumberVector(500, 0)  # 往右放
 
-                # 又是一个子文件夹
-                child_folder = EntityFolder(put_location, full_path_sub)
-                put_location += NumberVector(500, 0)  # 往右放
+                    child_folder.parent = self
 
-                child_folder.parent = self
-
-                self.children.append(child_folder)
-                child_folder.update_tree_content()  # 递归调用
+                    self.children.append(child_folder)
+                    child_folder.update_tree_content()  # 递归调用
             else:
+                if is_have:
+                    continue
                 # 是一个文件
                 child_file = EntityFile(put_location, full_path_sub, self)
                 put_location = NumberVector(0, 120)  # 往下放
@@ -270,7 +303,7 @@ class EntityFolder(Entity):
         pass
 
     def __repr__(self):
-        return f"EntityFolder({self.full_path})"
+        return f"({self.full_path})"
 
     pass
 

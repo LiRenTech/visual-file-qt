@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import (
     QMessageBox,
 )
 from PyQt5.QtGui import QPainter, QMouseEvent, QWheelEvent, QKeyEvent, QColor, QIcon
-from PyQt5.QtCore import Qt, QTimer, QPoint
+from PyQt5.QtCore import Qt, QTimer, QPoint, pyqtSignal
 
 from assets import assets
 
@@ -37,6 +37,7 @@ from paint.paint_elements import (
 
 
 class Canvas(QMainWindow):
+
     def __init__(self):
         super().__init__()
 
@@ -204,9 +205,11 @@ class Canvas(QMainWindow):
             print("Save operation cancelled.")
 
     def on_update(self):
+        if self.file_observer.root_folder is None:
+            return
+        # BUG：新增的东西可能会导致父文件夹形状炸开散架
         # 更新文件夹内容
-        # TODO:
-        print("更新文件")
+        self.file_observer.root_folder.update_tree_content()
         pass
 
     def on_import(self):

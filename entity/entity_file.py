@@ -76,3 +76,6 @@ class EntityFile(Entity):
             raise ValueError("读取的文件名不匹配", data["name"], self.file_name)
 
         self.body_shape.read_data(data["bodyShape"])
+
+    def __repr__(self):
+        return f"({self.file_name})"
