@@ -132,9 +132,6 @@ def paint_selected_rect(
     :param is_active: 如果是激活状态，绘制填充颜色，否则绘制边框颜色
     :return:
     """
-
-    if selected_entity is None:
-        return
     PainterUtils.paint_rect_from_left_top(
         paint,
         camera.location_world2view(selected_entity.body_shape.location_left_top),

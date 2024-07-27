@@ -1,3 +1,4 @@
+from typing import Any
 from data_struct.number_vector import NumberVector
 
 
@@ -7,14 +8,14 @@ class Rectangle:
         self.width: float = width
         self.height: float = height
 
-    def output_data(self) -> dict:
+    def output_data(self) -> dict[str, Any]:
         return {
             "width": self.width,
             "height": self.height,
             "locationLeftTop": [self.location_left_top.x, self.location_left_top.y],
         }
 
-    def read_data(self, data: dict):
+    def read_data(self, data: dict[str, Any]):
         if "width" not in data or "height" not in data or "locationLeftTop" not in data:
             raise ValueError("bodyShape 更新失败，缺少必要参数")
         self.width = data["width"]
@@ -23,19 +24,16 @@ class Rectangle:
             data["locationLeftTop"][0], data["locationLeftTop"][1]
         )
 
-    def __contains__(self, item) -> bool:
-        if isinstance(item, NumberVector):
-            return (
-                self.location_left_top.x
-                <= item.x
-                <= self.location_left_top.x + self.width
-            ) and (
-                self.location_left_top.y
-                <= item.y
-                <= self.location_left_top.y + self.height
-            )
-        else:
-            return False
+    def __contains__(self, item: NumberVector) -> bool:
+        return (
+            self.location_left_top.x
+            <= item.x
+            <= self.location_left_top.x + self.width
+        ) and (
+            self.location_left_top.y
+            <= item.y
+            <= self.location_left_top.y + self.height
+        )
 
     def clone(self) -> "Rectangle":
         return Rectangle(self.location_left_top.clone(), self.width, self.height)

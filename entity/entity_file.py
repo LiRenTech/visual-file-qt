@@ -2,6 +2,7 @@
 文件矩形实体
 """
 
+from typing import Any
 from data_struct.number_vector import NumberVector
 from data_struct.rectangle import Rectangle
 from entity.entity import Entity
@@ -14,7 +15,7 @@ class EntityFile(Entity):
     文件矩形
     """
 
-    def __init__(self, location_left_top: NumberVector, full_path: str, parent):
+    def __init__(self, location_left_top: NumberVector, full_path: str, parent: "EntityFolder"):
         """
         左上角的位置
         :param location_left_top:
@@ -62,14 +63,14 @@ class EntityFile(Entity):
         # 还要让父文件夹收缩调整
         self.parent.adjust()
 
-    def output_data(self) -> dict:
+    def output_data(self) -> dict[str, Any]:
         return {
             "kind": "file",
             "name": self.file_name,
             "bodyShape": self.body_shape.output_data(),
         }
 
-    def read_data(self, data: dict):
+    def read_data(self, data: dict[str, Any]):
         if data["kind"] != "file":
             raise ValueError("kind should be file")
         if data["name"] != self.file_name:

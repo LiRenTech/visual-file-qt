@@ -3,7 +3,7 @@ from data_struct.rectangle import Rectangle
 from entity.entity import Entity
 from entity.entity_file import EntityFile
 from tools.string_tools import get_width_by_file_name
-from typing import Optional
+from typing import Optional, Any
 
 
 class EntityFolder(Entity):
@@ -45,7 +45,7 @@ class EntityFolder(Entity):
         # 这个矩形有点麻烦，它可能应该是一个动态变化的东西，不应该变的是它的左上角位置，变得是他的大小
         self.adjust()
 
-    def output_data(self) -> dict:
+    def output_data(self) -> dict[str, Any]:
         """
         递归的输出数据，最终返回一个字典
         :return:
@@ -57,7 +57,7 @@ class EntityFolder(Entity):
             "children": [child.output_data() for child in self.children],
         }
 
-    def read_data(self, data: dict):
+    def read_data(self, data: dict[str, Any]):
         """
         读取数据 直接导致文件夹更新布局位置信息
         :param data:
@@ -278,8 +278,6 @@ class EntityFolder(Entity):
                 # 是文件夹，继续递归
                 self._adjust_tree_dfs(child)
         # ===
-        if not isinstance(folder, EntityFolder):
-            return
 
         # 调整当前文件夹里的所有实体顺序位置
 
