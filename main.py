@@ -10,7 +10,15 @@ from PyQt5.QtWidgets import (
     QFileDialog,
     QMessageBox,
 )
-from PyQt5.QtGui import QPainter, QMouseEvent, QWheelEvent, QKeyEvent, QColor, QIcon
+from PyQt5.QtGui import (
+    QPainter,
+    QMouseEvent,
+    QWheelEvent,
+    QKeyEvent,
+    QColor,
+    QIcon,
+    QPaintEvent,
+)
 from PyQt5.QtCore import Qt, QTimer, QPoint, pyqtSignal
 
 from assets import assets
@@ -230,7 +238,6 @@ class Canvas(QMainWindow):
             with open(file_path, "r") as f:
                 layout_dict = json.load(f)
 
-            print(type(layout_dict), layout_dict)
             try:
                 self._is_updating_layout = True
                 self.file_observer.read_layout_dict(layout_dict)
@@ -263,7 +270,8 @@ class Canvas(QMainWindow):
         # 重绘窗口
         self.update()
 
-    def paintEvent(self, event):
+    def paintEvent(self, a0: QPaintEvent | None):
+        assert a0 is not None
         painter = QPainter(self)
 
         # 获取窗口的尺寸
@@ -295,13 +303,13 @@ class Canvas(QMainWindow):
             if file_entity.body_shape.is_collision(self.camera.cover_world_rectangle):
                 paint_file_rect(painter, self.camera, file_entity)
         # 绘制选中的区域
-        assert self.file_observer.dragging_entity
-        paint_selected_rect(
-            painter,
-            self.camera,
-            self.file_observer.dragging_entity,
-            self.file_observer.dragging_entity_activating,
-        )
+        if self.file_observer.dragging_entity:
+            paint_selected_rect(
+                painter,
+                self.camera,
+                self.file_observer.dragging_entity,
+                self.file_observer.dragging_entity_activating,
+            )
         # 绘制细节信息
         paint_details_data(
             painter,
@@ -312,38 +320,34 @@ class Canvas(QMainWindow):
             ],
         )
 
-    def mousePressEvent(self, event: QMouseEvent):
-        if event.button() == Qt.MouseButton.LeftButton:
-            point_view_location = NumberVector(event.pos().x(), event.pos().y())
+    def mousePressEvent(self, a0: QMouseEvent | None):
+        assert a0 is not None
+        if a0.button() == Qt.MouseButton.LeftButton:
+            point_view_location = NumberVector(a0.pos().x(), a0.pos().y())
             point_world_location = self.camera.location_view2world(point_view_location)
             entity = self.file_observer.get_entity_by_location(point_world_location)
             if entity:
-
-                # 让它吸附在鼠标上
-                if isinstance(entity, EntityFile):
-                    pass
-                elif isinstance(entity, EntityFolder):
-                    pass
                 self.file_observer.dragging_entity = entity
                 self.file_observer.dragging_offset = (
                     point_world_location - entity.body_shape.location_left_top
                 )
             else:
                 self.file_observer.dragging_entity = None
-        elif event.button() == Qt.MouseButton.MiddleButton:
+        elif a0.button() == Qt.MouseButton.MiddleButton:
             # 开始准备移动，记录好上一次鼠标位置的相差距离向量
             self._last_mouse_move_location = self.camera.location_view2world(
-                NumberVector(event.pos().x(), event.pos().y())
+                NumberVector(a0.pos().x(), a0.pos().y())
             )
             pass
 
-    def mouseMoveEvent(self, event: QMouseEvent):
-        if event.buttons() == Qt.MouseButton.LeftButton:
+    def mouseMoveEvent(self, a0: QMouseEvent | None):
+        assert a0 is not None
+        if a0.buttons() == Qt.MouseButton.LeftButton:
             if self.file_observer.is_drag_locked:
                 return
             # 左键拖拽，但要看看是否是激活状态
             try:
-                point_view_location = NumberVector(event.pos().x(), event.pos().y())
+                point_view_location = NumberVector(a0.pos().x(), a0.pos().y())
                 point_world_location = self.camera.location_view2world(
                     point_view_location
                 )
@@ -364,19 +368,20 @@ class Canvas(QMainWindow):
                 print(e)
                 traceback.print_exc()
                 pass
-        if event.buttons() == Qt.MouseButton.MiddleButton:
+        if a0.buttons() == Qt.MouseButton.MiddleButton:
             # 移动的时候，应该记录与上一次鼠标位置的相差距离向量
             current_mouse_move_location = self.camera.location_view2world(
-                NumberVector(event.pos().x(), event.pos().y())
+                NumberVector(a0.pos().x(), a0.pos().y())
             )
             diff_location = current_mouse_move_location - self._last_mouse_move_location
             self.camera.location -= diff_location
 
-    def mouseReleaseEvent(self, event: QMouseEvent):
-        if event.button() == Qt.MouseButton.MiddleButton:
+    def mouseReleaseEvent(self, a0: QMouseEvent | None):
+        assert a0 is not None
+        if a0.button() == Qt.MouseButton.MiddleButton:
             if self.file_observer.is_drag_locked:
                 return
-            point_view_location = NumberVector(event.pos().x(), event.pos().y())
+            point_view_location = NumberVector(a0.pos().x(), a0.pos().y())
             point_world_location = self.camera.location_view2world(point_view_location)
             entity = self.file_observer.get_entity_by_location(point_world_location)
             if entity:
@@ -385,9 +390,10 @@ class Canvas(QMainWindow):
                 # 让它脱离鼠标吸附
                 self.file_observer.dragging_entity = None
 
-    def mouseDoubleClickEvent(self, event: QMouseEvent):
-        if event.button() == Qt.MouseButton.LeftButton:
-            point_view_location = NumberVector(event.pos().x(), event.pos().y())
+    def mouseDoubleClickEvent(self, a0: QMouseEvent | None):
+        assert a0 is not None
+        if a0.button() == Qt.MouseButton.LeftButton:
+            point_view_location = NumberVector(a0.pos().x(), a0.pos().y())
             point_world_location = self.camera.location_view2world(point_view_location)
             entity = self.file_observer.get_entity_by_location(point_world_location)
             if entity:
@@ -395,18 +401,20 @@ class Canvas(QMainWindow):
 
         pass
 
-    def wheelEvent(self, event: QWheelEvent):
+    def wheelEvent(self, a0: QWheelEvent | None):
+        assert a0 is not None
         # 检查滚轮方向
-        if event.angleDelta().y() > 0:
+        if a0.angleDelta().y() > 0:
             self.camera.zoom_in()
         else:
             self.camera.zoom_out()
 
         # 你可以在这里添加更多的逻辑来响应滚轮事件
-        event.accept()
+        a0.accept()
 
-    def keyPressEvent(self, event: QKeyEvent):
-        key = event.key()
+    def keyPressEvent(self, a0: QKeyEvent | None):
+        assert a0 is not None
+        key = a0.key()
         if key == Qt.Key.Key_A:
             self.camera.press_move(NumberVector(-1, 0))
         elif key == Qt.Key.Key_S:
@@ -416,8 +424,9 @@ class Canvas(QMainWindow):
         elif key == Qt.Key.Key_W:
             self.camera.press_move(NumberVector(0, -1))
 
-    def keyReleaseEvent(self, event: QKeyEvent):
-        key = event.key()
+    def keyReleaseEvent(self, a0: QKeyEvent | None):
+        assert a0 is not None
+        key = a0.key()
         if key == Qt.Key.Key_A:
             self.camera.release_move(NumberVector(-1, 0))
         elif key == Qt.Key.Key_S:
