@@ -149,4 +149,55 @@ class PainterUtils:
             traceback.print_exc()
         pass
 
+    @staticmethod
+    def paint_word_from_center(
+        painter: QPainter,
+        center: NumberVector,
+        text: str,
+        font_size: float,
+        color: QColor,
+    ):
+        """
+        绘制一个文本，其中心坐标为中心point，文本为text，字体大小为font_size，颜色为color
+        :param painter: QPainter对象
+        :param center: 文本的中心点 (NumberVector类型)
+        :param text: 要绘制的文本
+        :param font_size: 字体大小
+        :param color: 文本颜色
+        :return: None
+        """
+        try:
+            font = QFont("Consolas")
+            font.setPointSize(round(font_size))
+            font_metrics = QFontMetrics(font)
+
+            # 设置QPainter的字体和颜色
+            painter.setFont(font)
+            painter.setPen(color)
+
+            # 转换center为整数坐标
+            center = center.integer()
+            center = QPoint(center.x, center.y)
+
+            # 获取文本的宽度和高度
+            text_width = font_metrics.width(text)
+            text_height = font_metrics.height()
+            ascent = font_metrics.ascent()
+
+            # 计算文本中心点相对于左上角的位置
+            left_top_x = center.x() - text_width // 2
+            left_top_y = center.y() - ascent
+
+            # 创建新的左上角坐标
+            left_top = QPoint(left_top_x, left_top_y)
+
+            # 绘制文本
+            painter.drawText(left_top, text)
+        except Exception as e:
+            print(f"Exception type: {type(e)}")
+            print(f"Error message: {str(e)}")
+            import traceback
+
+            traceback.print_exc()
+
     pass

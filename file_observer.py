@@ -98,7 +98,7 @@ class FileObserver:
         return self._entity_files(self.root_folder)
 
     def get_entity_by_location(
-            self, location_world: NumberVector
+        self, location_world: NumberVector
     ) -> EntityFile | EntityFolder | None:
         """
         判断一个点是否击中了某个实体文件

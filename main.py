@@ -271,31 +271,20 @@ class Canvas(QMainWindow):
             # 正在更新布局，绘制一个提醒
             paint_alert_message(painter, self.camera, "正在更新文件夹内容，请稍后...")
             return
+        # 如果没有文件夹，绘制提示信息
+        if self.file_observer.root_folder is None:
+            paint_alert_message(painter, self.camera, "请先打开文件夹")
         # 画场景物体
 
         # 先画文件夹
-        is_danger = False
         for folder_entity in self.file_observer.get_entity_folders():
-            if not folder_entity.body_shape:
-                print(folder_entity)
-                print(f"warn!,[folder] {folder_entity.full_path} body shape is None")
-                is_danger = True
-                continue
-            if folder_entity.body_shape.is_collision(
-                self.camera.cover_world_rectangle
-            ):  # bodyShape可能是None
+            if folder_entity.body_shape.is_collision(self.camera.cover_world_rectangle):
                 # 获得一个世界坐标系的视野矩形，用于排除视野之外的绘制，防止放大了之后会卡
                 paint_folder_rect(painter, self.camera, folder_entity)
         # 后画文件
         for file_entity in self.file_observer.get_entity_files():
-            if not file_entity.body_shape:
-                print(f"warn!,[file] {file_entity.full_path} body shape is None")
-                is_danger = True
-                continue
             if file_entity.body_shape.is_collision(self.camera.cover_world_rectangle):
                 paint_file_rect(painter, self.camera, file_entity)
-        if is_danger:
-            exit(1)
         # 绘制选中的区域
         paint_selected_rect(
             painter,
