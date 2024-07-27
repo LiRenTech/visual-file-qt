@@ -106,8 +106,8 @@ def paint_file_rect(paint: QPainter, camera: Camera, entity_file: EntityFile):
         QColor(0, 0, 0, 255),
         QColor(255, 255, 255, 255),
     )
-    # camera scale < 0.05 的时候不渲染文字了，会导致文字突然变大，重叠一大堆
-    if camera.current_scale < 0.05:
+    # camera scale < 0.15 的时候不渲染文字了，会导致文字突然变大，重叠一大堆
+    if camera.current_scale < 0.15:
         return
     # 再画文字
     PainterUtils.paint_word_from_left_top(
