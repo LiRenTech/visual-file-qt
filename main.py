@@ -69,34 +69,45 @@ class Canvas(QMainWindow):
 
         # 创建菜单栏
         menubar = self.menuBar()
-        # 创建 "File" 菜单
-        file_menu = menubar.addMenu("File")
+        # 创建 "文件夹" 菜单
+        folder_menu = menubar.addMenu("文件夹")
         # 创建 "Open" 菜单项
-        open_action = QAction("直接读取文件夹", self)
+        open_action = QAction("打开文件夹", self)
         open_action.setShortcut("Ctrl+O")
-        file_menu.addAction(open_action)
+        folder_menu.addAction(open_action)
         open_action.triggered.connect(self.on_open)
-
-        # 创建 "Save" 菜单项
-        save_action = QAction("导出布局文件", self)
-        save_action.setShortcut("Ctrl+S")
-        file_menu.addAction(save_action)
-        save_action.triggered.connect(self.on_save)
 
         # 创建 "Update" 菜单项
         update_action = QAction("更新文件夹", self)
         update_action.setShortcut("Ctrl+U")
-        file_menu.addAction(update_action)
+        folder_menu.addAction(update_action)
         update_action.triggered.connect(self.on_update)
 
+        # “布局”菜单
+        layout_menu = menubar.addMenu("布局")
+        # 创建 "Save" 菜单项
+        save_action = QAction("导出布局文件", self)
+        save_action.setShortcut("Ctrl+S")
+        layout_menu.addAction(save_action)
+        save_action.triggered.connect(self.on_save)
         # 创建 导入 菜单项
         import_action = QAction("导入布局文件并更新布局", self)
         import_action.setShortcut("Ctrl+I")
-        file_menu.addAction(import_action)
+        layout_menu.addAction(import_action)
         import_action.triggered.connect(self.on_import)
 
-        # "View" 菜单
-        view_menu = menubar.addMenu("View")
+        drag_lock = QAction("锁定拖拽", self)
+        drag_lock.setShortcut("Ctrl+L")
+        layout_menu.addAction(drag_lock)
+        drag_lock.triggered.connect(lambda: self.file_observer.set_drag_lock(True))
+
+        drag_unlock = QAction("解锁拖拽", self)
+        drag_unlock.setShortcut("Ctrl+U")
+        layout_menu.addAction(drag_unlock)
+        drag_unlock.triggered.connect(lambda: self.file_observer.set_drag_lock(False))
+
+        # "视野" 菜单
+        view_menu = menubar.addMenu("视野")
         # 创建 "Reset" 菜单项
         reset_action = QAction("重置缩放", self)
         reset_action.setShortcut("Ctrl+0")
@@ -128,18 +139,9 @@ class Canvas(QMainWindow):
             lambda: self.camera.set_scale_animation(False)
         )
 
-        drag_lock = QAction("锁定拖拽", self)
-        drag_lock.setShortcut("Ctrl+L")
-        view_menu.addAction(drag_lock)
-        drag_lock.triggered.connect(lambda: self.file_observer.set_drag_lock(True))
-
-        drag_unlock = QAction("解锁拖拽", self)
-        drag_unlock.setShortcut("Ctrl+U")
-        view_menu.addAction(drag_unlock)
-        drag_unlock.triggered.connect(lambda: self.file_observer.set_drag_lock(False))
 
         # 创建帮助说明菜单项
-        help_menu = menubar.addMenu("Help")
+        help_menu = menubar.addMenu("帮助")
         help_action = QAction("帮助说明", self)
         help_action.setShortcut("Ctrl+H")
         help_menu.addAction(help_action)
