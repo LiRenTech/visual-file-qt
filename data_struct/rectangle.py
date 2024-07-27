@@ -37,6 +37,9 @@ class Rectangle:
         else:
             return False
 
+    def clone(self) -> "Rectangle":
+        return Rectangle(self.location_left_top.clone(), self.width, self.height)
+
     def right(self):
         """返回最右侧的x坐标
 

@@ -139,7 +139,6 @@ class Canvas(QMainWindow):
             lambda: self.camera.set_scale_animation(False)
         )
 
-
         # 创建帮助说明菜单项
         help_menu = menubar.addMenu("帮助")
         help_action = QAction("帮助说明", self)

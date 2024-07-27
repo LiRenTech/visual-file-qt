@@ -282,22 +282,30 @@ class EntityFolder(Entity):
             return
 
         # 调整当前文件夹里的所有实体顺序位置
-        # 暂时采取竖着放的策略
 
-        current_y = folder.body_shape.location_left_top.y + self.PADDING
-        for child in folder.children:
-            # 顶部对齐，不能直接修改位置来对齐，因为如果是一个文件夹，会导致它的子文件脱离了位置。
+        rectangle_list = [child.body_shape for child in folder.children]
+        sorted_rectangle_list = sort_rectangle(
+            [rectangle.clone() for rectangle in rectangle_list], self.PADDING
+        )
+
+        # ===
+        # 先检查一下排序策略函数是否顺序正确
+        if len(sorted_rectangle_list) != len(rectangle_list):
+            print("排序策略错误，前后数组不相等")
+
+        for i, rect in enumerate(rectangle_list):
+            if (
+                sorted_rectangle_list[i].width != rect.width
+                or sorted_rectangle_list[i].height != rect.height
+            ):
+                print("排序策略错误")
+        # ===
+
+        for i, child in enumerate(folder.children):
             child.move_to(
-                NumberVector(
-                    folder.body_shape.location_left_top.x + self.PADDING, current_y
-                )
+                sorted_rectangle_list[i].location_left_top
+                + self.body_shape.location_left_top
             )
-            current_y += child.body_shape.height + self.PADDING
-
-        # rectangle_list = [child.body_shape for child in folder.children]
-        # sorted_rectangle_list = sort_rectangle(rectangle_list, self.PADDING)
-        # for (i, child) in enumerate(folder.children):
-        #     child.move_to(sorted_rectangle_list[i].location_left_top)
 
         folder.adjust()
         pass
@@ -306,6 +314,26 @@ class EntityFolder(Entity):
         return f"({self.full_path})"
 
     pass
+
+
+def sort_rectangle_just_vertical(
+    rectangles: list[Rectangle], margin: float
+) -> list[Rectangle]:
+    """
+    仅仅将一些矩形左对齐 竖向简单排列
+    这会假设外层父文件夹左上角顶点为 0 0
+    :param rectangles:
+    :param margin:
+    :return:
+    """
+    current_y = margin
+
+    for rectangle in rectangles:
+        rectangle.location_left_top.y = current_y
+        rectangle.location_left_top.x = margin
+        current_y += rectangle.height + margin
+
+    return rectangles
 
 
 def sort_rectangle(rectangles: list[Rectangle], margin: float) -> list[Rectangle]:
