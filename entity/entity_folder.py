@@ -103,7 +103,9 @@ class EntityFolder(Entity):
         super().move(d_location)
         # 还要，移动文件夹内所有实体
         for child in self.children:
-            child.move(d_location)
+            # 移动自己内部所有实体的时候，也不能用move函数本身，会炸开花。
+            # child.move(d_location)
+            child.move_to(child.body_shape.location_left_top + d_location)
 
         # 推移其他同层的矩形框 TODO: 此处有点重复代码
         if not self.parent:
