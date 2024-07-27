@@ -2,7 +2,7 @@
 这个里面绘制的元素都是直接基于渲染坐标来绘制的，不是世界坐标
 """
 
-from PyQt5.QtCore import QPoint
+from PyQt5.QtCore import QPoint, Qt
 from PyQt5.QtGui import QPainter, QColor, QPen, QFont, QFontMetrics
 
 from data_struct.number_vector import NumberVector
@@ -56,7 +56,10 @@ class PainterUtils:
         :param dash_length:
         :return:
         """
-        painter.setPen(color)
+        pen = QPen(color, width)  # 创建QPen并设置颜色和宽度
+        pen.setStyle(Qt.PenStyle.DashLine)  # 设置线型为虚线
+        pen.setDashPattern([dash_length, dash_length])  # 设置虚线长度
+        painter.setPen(pen)
         painter.setBrush(color)
         painter.setRenderHint(QPainter.Antialiasing)
         dx = point2.x - point1.x
@@ -70,9 +73,7 @@ class PainterUtils:
         painter.setPen(QColor(0, 0, 0, 0))
         painter.setBrush(QColor(0, 0, 0, 0))
         painter.setRenderHint(QPainter.Antialiasing, False)
-        painter.drawLines(
-            int(point1.x), int(point1.y), int(point2.x), int(point2.y), dash_pattern
-        )
+        painter.drawLine(int(point1.x), int(point1.y), int(point2.x), int(point2.y))
         pass
 
     @staticmethod
@@ -133,7 +134,7 @@ class PainterUtils:
 
             # 转换left_top为整数坐标
             left_top = left_top.integer()
-            left_top = QPoint(left_top.x, left_top.y)
+            left_top = QPoint(int(left_top.x), int(left_top.y))
 
             # 计算字体的ascent值，即基线到顶的距离
             ascent = font_metrics.ascent()
@@ -177,7 +178,7 @@ class PainterUtils:
 
             # 转换center为整数坐标
             center = center.integer()
-            center = QPoint(center.x, center.y)
+            center = QPoint(int(center.x), int(center.y))
 
             # 获取文本的宽度和高度
             text_width = font_metrics.width(text)

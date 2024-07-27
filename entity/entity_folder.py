@@ -40,7 +40,7 @@ class EntityFolder(Entity):
         super().__init__(self.body_shape)
         # 属性节点关系
         self.parent: Optional["EntityFolder"] = None
-        self.children: list["EntityFolder" | EntityFile] = []
+        self.children: "list[EntityFolder | EntityFile]" = []
 
         # 这个矩形有点麻烦，它可能应该是一个动态变化的东西，不应该变的是它的左上角位置，变得是他的大小
         self.adjust()
@@ -103,7 +103,7 @@ class EntityFolder(Entity):
         # 推移其他同层的矩形框 TODO: 此处有点重复代码
         if not self.parent:
             return
-        brother_entities: list[Entity] = self.parent.children
+        brother_entities: list[EntityFile | EntityFolder] = self.parent.children
 
         # d_location 经过测试发现不是0
 

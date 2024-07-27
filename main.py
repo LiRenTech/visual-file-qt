@@ -69,8 +69,10 @@ class Canvas(QMainWindow):
 
         # 创建菜单栏
         menubar = self.menuBar()
+        assert menubar
         # 创建 "文件夹" 菜单
         folder_menu = menubar.addMenu("文件夹")
+        assert folder_menu
         # 创建 "Open" 菜单项
         open_action = QAction("打开文件夹", self)
         open_action.setShortcut("Ctrl+O")
@@ -85,6 +87,7 @@ class Canvas(QMainWindow):
 
         # “布局”菜单
         layout_menu = menubar.addMenu("布局")
+        assert layout_menu
         # 创建 "Save" 菜单项
         save_action = QAction("导出布局文件", self)
         save_action.setShortcut("Ctrl+S")
@@ -108,6 +111,7 @@ class Canvas(QMainWindow):
 
         # "视野" 菜单
         view_menu = menubar.addMenu("视野")
+        assert view_menu
         # 创建 "Reset" 菜单项
         reset_action = QAction("重置缩放", self)
         reset_action.setShortcut("Ctrl+0")
@@ -141,6 +145,7 @@ class Canvas(QMainWindow):
 
         # 创建帮助说明菜单项
         help_menu = menubar.addMenu("帮助")
+        assert help_menu
         help_action = QAction("帮助说明", self)
         help_action.setShortcut("Ctrl+H")
         help_menu.addAction(help_action)
@@ -290,6 +295,7 @@ class Canvas(QMainWindow):
             if file_entity.body_shape.is_collision(self.camera.cover_world_rectangle):
                 paint_file_rect(painter, self.camera, file_entity)
         # 绘制选中的区域
+        assert self.file_observer.dragging_entity
         paint_selected_rect(
             painter,
             self.camera,
@@ -307,7 +313,7 @@ class Canvas(QMainWindow):
         )
 
     def mousePressEvent(self, event: QMouseEvent):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             point_view_location = NumberVector(event.pos().x(), event.pos().y())
             point_world_location = self.camera.location_view2world(point_view_location)
             entity = self.file_observer.get_entity_by_location(point_world_location)
@@ -324,7 +330,7 @@ class Canvas(QMainWindow):
                 )
             else:
                 self.file_observer.dragging_entity = None
-        elif event.button() == Qt.MiddleButton:
+        elif event.button() == Qt.MouseButton.MiddleButton:
             # 开始准备移动，记录好上一次鼠标位置的相差距离向量
             self._last_mouse_move_location = self.camera.location_view2world(
                 NumberVector(event.pos().x(), event.pos().y())
@@ -332,7 +338,7 @@ class Canvas(QMainWindow):
             pass
 
     def mouseMoveEvent(self, event: QMouseEvent):
-        if event.buttons() == Qt.LeftButton:
+        if event.buttons() == Qt.MouseButton.LeftButton:
             if self.file_observer.is_drag_locked:
                 return
             # 左键拖拽，但要看看是否是激活状态
@@ -358,7 +364,7 @@ class Canvas(QMainWindow):
                 print(e)
                 traceback.print_exc()
                 pass
-        if event.buttons() == Qt.MiddleButton:
+        if event.buttons() == Qt.MouseButton.MiddleButton:
             # 移动的时候，应该记录与上一次鼠标位置的相差距离向量
             current_mouse_move_location = self.camera.location_view2world(
                 NumberVector(event.pos().x(), event.pos().y())
@@ -367,7 +373,7 @@ class Canvas(QMainWindow):
             self.camera.location -= diff_location
 
     def mouseReleaseEvent(self, event: QMouseEvent):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.MiddleButton:
             if self.file_observer.is_drag_locked:
                 return
             point_view_location = NumberVector(event.pos().x(), event.pos().y())
@@ -380,7 +386,7 @@ class Canvas(QMainWindow):
                 self.file_observer.dragging_entity = None
 
     def mouseDoubleClickEvent(self, event: QMouseEvent):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             point_view_location = NumberVector(event.pos().x(), event.pos().y())
             point_world_location = self.camera.location_view2world(point_view_location)
             entity = self.file_observer.get_entity_by_location(point_world_location)
@@ -401,24 +407,24 @@ class Canvas(QMainWindow):
 
     def keyPressEvent(self, event: QKeyEvent):
         key = event.key()
-        if key == Qt.Key_A:
+        if key == Qt.Key.Key_A:
             self.camera.press_move(NumberVector(-1, 0))
-        elif key == Qt.Key_S:
+        elif key == Qt.Key.Key_S:
             self.camera.press_move(NumberVector(0, 1))
-        elif key == Qt.Key_D:
+        elif key == Qt.Key.Key_D:
             self.camera.press_move(NumberVector(1, 0))
-        elif key == Qt.Key_W:
+        elif key == Qt.Key.Key_W:
             self.camera.press_move(NumberVector(0, -1))
 
     def keyReleaseEvent(self, event: QKeyEvent):
         key = event.key()
-        if key == Qt.Key_A:
+        if key == Qt.Key.Key_A:
             self.camera.release_move(NumberVector(-1, 0))
-        elif key == Qt.Key_S:
+        elif key == Qt.Key.Key_S:
             self.camera.release_move(NumberVector(0, 1))
-        elif key == Qt.Key_D:
+        elif key == Qt.Key.Key_D:
             self.camera.release_move(NumberVector(1, 0))
-        elif key == Qt.Key_W:
+        elif key == Qt.Key.Key_W:
             self.camera.release_move(NumberVector(0, -1))
 
 

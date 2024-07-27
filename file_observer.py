@@ -80,6 +80,7 @@ class FileObserver:
         :return:
         """
 
+        assert self.root_folder
         res = [self.root_folder]
         for file in folder.children:
             if isinstance(file, EntityFolder):
