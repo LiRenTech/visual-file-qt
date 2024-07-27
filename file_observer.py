@@ -38,6 +38,12 @@ class FileObserver:
         self.root_folder.update_tree_content()
         self.root_folder.adjust_tree_location()
         self.dragging_entity = None
+        # 还需要将新的文件夹移动到世界坐标的中心。
+        target_location_left_top = NumberVector(0, 0) - NumberVector(
+            self.root_folder.body_shape.width / 2,
+            self.root_folder.body_shape.height / 2,
+        )
+        self.root_folder.move_to(target_location_left_top)
 
     def output_layout_dict(self) -> dict:
         """

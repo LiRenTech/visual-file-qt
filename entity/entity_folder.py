@@ -23,9 +23,13 @@ class EntityFolder(Entity):
         "dist",
         "build",
         "venv",
+        ".venv"
         "env",
         "temp",
         ".vscode",
+        "migrations",  # 数据库迁移文件
+        "logs",  # 日志文件
+        "cache",  # 缓存文件
     ]
 
     def __init__(self, location_left_top: NumberVector, full_path: str):

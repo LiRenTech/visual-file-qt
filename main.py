@@ -1,5 +1,6 @@
 import traceback
 import json
+import time
 
 from PyQt5.QtWidgets import (
     QApplication,
@@ -66,6 +67,8 @@ class Canvas(QMainWindow):
         self._last_mouse_move_location = NumberVector.zero()  # 注意这是一个世界坐标
         # 是否正在更新布局
         self._is_updating_layout = False
+        # 是否正在打开文件夹
+        self._is_open_folder = False  # 没有起到效果
 
     def init_ui(self):
         # 设置窗口标题和尺寸
@@ -194,7 +197,13 @@ class Canvas(QMainWindow):
         directory = QFileDialog.getExistingDirectory(self, "选择要直观化查看的文件夹")
 
         if directory:
+            # paint_alert_message(painter, self.camera, "请先打开文件夹")
+            self._is_open_folder = True
+            time.sleep(0.5)
             self.file_observer.update_file_path(directory)
+            self._is_open_folder = False
+
+            
         pass
 
     def on_save(self):
@@ -254,6 +263,9 @@ class Canvas(QMainWindow):
 
     def tick(self):
         self.camera.tick()
+        # 重绘窗口
+        self.update()
+
         if self.file_observer.dragging_entity:
             # 对比当前选中的实体矩形和视野矩形
             if self.camera.cover_world_rectangle.is_contain(
@@ -267,8 +279,7 @@ class Canvas(QMainWindow):
                 self.file_observer.dragging_entity_activating = False
                 pass
             pass
-        # 重绘窗口
-        self.update()
+
 
     def paintEvent(self, a0: QPaintEvent | None):
         assert a0 is not None
@@ -285,9 +296,10 @@ class Canvas(QMainWindow):
         paint_grid(painter, self.camera)
 
         if self._is_updating_layout:
-            # 正在更新布局，绘制一个提醒
-            paint_alert_message(painter, self.camera, "正在更新文件夹内容，请稍后...")
+            paint_alert_message(painter, self.camera, "正在更新布局，请稍后...")
             return
+        if self._is_open_folder:
+            paint_alert_message(painter, self.camera, "正在打开文件夹，请稍后...")
         # 如果没有文件夹，绘制提示信息
         if self.file_observer.root_folder is None:
             paint_alert_message(painter, self.camera, "请先打开文件夹")
