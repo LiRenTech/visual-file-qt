@@ -169,7 +169,7 @@ class PainterUtils:
         """
         try:
             font = QFont("Consolas")
-            font.setPointSize(round(font_size))
+            font.setPointSize(int(font_size))
             font_metrics = QFontMetrics(font)
 
             # 设置QPainter的字体和颜色

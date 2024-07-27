@@ -26,13 +26,9 @@ class Rectangle:
 
     def __contains__(self, item: NumberVector) -> bool:
         return (
-            self.location_left_top.x
-            <= item.x
-            <= self.location_left_top.x + self.width
+            self.location_left_top.x <= item.x <= self.location_left_top.x + self.width
         ) and (
-            self.location_left_top.y
-            <= item.y
-            <= self.location_left_top.y + self.height
+            self.location_left_top.y <= item.y <= self.location_left_top.y + self.height
         )
 
     def clone(self) -> "Rectangle":

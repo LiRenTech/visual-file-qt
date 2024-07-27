@@ -23,7 +23,7 @@ class Entity:
 
     def move_to(self, location: NumberVector):
         """
-        移动实体到指定位置
+        移动实体到指定位置，让实体的左上角顶点对齐到指定位置
         :param location:
         :return:
         """

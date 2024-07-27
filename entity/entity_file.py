@@ -15,7 +15,9 @@ class EntityFile(Entity):
     文件矩形
     """
 
-    def __init__(self, location_left_top: NumberVector, full_path: str, parent: "EntityFolder"):
+    def __init__(
+        self, location_left_top: NumberVector, full_path: str, parent: "EntityFolder"
+    ):
         """
         左上角的位置
         :param location_left_top:

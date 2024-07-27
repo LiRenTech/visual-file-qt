@@ -104,9 +104,13 @@ class EntityFolder(Entity):
         # 推移其他同层的矩形框 TODO: 此处有点重复代码
         if not self.parent:
             return
-        brother_entities: list[EntityFile | EntityFolder] = self.parent.children
 
-        # d_location 经过测试发现不是0
+        # 让父文件夹收缩调整
+        self.parent.adjust()
+
+        # ==== 开始同层碰撞检测
+
+        brother_entities: list[EntityFile | EntityFolder] = self.parent.children
 
         for entity in brother_entities:
             if entity == self:
@@ -121,10 +125,8 @@ class EntityFolder(Entity):
                 d_distance = (entity_center_location - self_center_location).normalize()
                 d_distance *= d_location.magnitude()
                 # 弹开距离
-                entity.move(d_distance)  # 这一弹，变成递归函数了
-
-        # 还要让父文件夹收缩调整
-        self.parent.adjust()
+                # entity.move(d_distance)  # 这一弹，是造成碰撞、其他物体位置连续炸开花的罪魁祸首。
+                entity.move_to(entity.body_shape.location_left_top + d_distance)
 
     def move_to(self, location_left_top: NumberVector):
         """

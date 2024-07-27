@@ -39,6 +39,7 @@ def sort_rectangle_just_vertical(
 
     return rectangles
 
+
 def sort_rectangle_greedy(
     rectangles: list[Rectangle], margin: float
 ) -> list[Rectangle]:
