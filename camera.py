@@ -113,8 +113,8 @@ class Camera:
                 self.current_scale += (self.target_scale - self.current_scale) / 10
             
             # 彩蛋，《微观尽头》——刘慈欣
-            SCALE_MAX = 1000
-            SCALE_MIN = 0.0001
+            SCALE_MAX = 150
+            SCALE_MIN = 0.001
             if self.current_scale > SCALE_MAX:
                 self.current_scale = SCALE_MIN * 2
                 self.target_scale = SCALE_MIN * 2

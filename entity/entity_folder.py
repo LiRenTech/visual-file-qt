@@ -175,7 +175,7 @@ class EntityFolder(Entity):
         """
         if not self.children:
             return 1
-        max_deep_level = 0
+        max_deep_level = 1
         for child in self.children:
             if isinstance(child, EntityFolder):
                 deep_level = child.count_deep_level() + 1
