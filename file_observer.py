@@ -10,6 +10,7 @@ class FileObserver:
         初始化文件观察者
         """
         self.folder_full_path: str = ""
+        self.folder_max_deep_index = 0 + 1  # 当前最深的深度，用于渲染颜色
 
         self.root_folder: EntityFolder | None = None
         # 当前正在拖拽的
@@ -44,6 +45,8 @@ class FileObserver:
             self.root_folder.body_shape.height / 2,
         )
         self.root_folder.move_to(target_location_left_top)
+
+        self.folder_max_deep_index = self.root_folder.count_deep_level()
 
     def output_layout_dict(self) -> dict:
         """

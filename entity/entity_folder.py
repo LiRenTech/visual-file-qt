@@ -23,8 +23,7 @@ class EntityFolder(Entity):
         "dist",
         "build",
         "venv",
-        ".venv"
-        "env",
+        ".venv" "env",
         "temp",
         ".vscode",
         "migrations",  # 数据库迁移文件
@@ -33,12 +32,14 @@ class EntityFolder(Entity):
     ]
 
     def __init__(self, location_left_top: NumberVector, full_path: str):
+
         full_path = full_path.replace("\\", "/")
         folder_name = full_path.split("/")[-1]
 
         self.full_path = full_path
         self.location = location_left_top
         self.folder_name = folder_name
+        self.deep_level = 0  # 相对深度。最顶层为0
         self.body_shape = Rectangle(
             location_left_top, get_width_by_file_name(folder_name) * 2, 500
         )
@@ -167,6 +168,20 @@ class EntityFolder(Entity):
                 raise ValueError("子节点类型错误", child)
         return False
 
+    def count_deep_level(self) -> int:
+        """
+        计算文件夹的深度
+        :return:
+        """
+        if not self.children:
+            return 1
+        max_deep_level = 0
+        for child in self.children:
+            if isinstance(child, EntityFolder):
+                deep_level = child.count_deep_level() + 1
+                max_deep_level = max(max_deep_level, deep_level)
+        return max_deep_level
+
     def update_tree_content(self):
         """
         更新文件夹树结构内容，不更新显示位置大小
@@ -207,6 +222,7 @@ class EntityFolder(Entity):
                     put_location += NumberVector(500, 0)  # 往右放
 
                     child_folder.parent = self
+                    child_folder.deep_level = self.deep_level + 1
 
                     self.children.append(child_folder)
                     child_folder.update_tree_content()  # 递归调用
@@ -218,6 +234,7 @@ class EntityFolder(Entity):
                 put_location = NumberVector(0, 120)  # 往下放
 
                 child_file.parent = self
+                child_file.deep_level = self.deep_level + 1
 
                 self.children.append(child_file)
         pass

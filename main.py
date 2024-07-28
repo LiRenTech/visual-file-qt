@@ -203,7 +203,6 @@ class Canvas(QMainWindow):
             self.file_observer.update_file_path(directory)
             self._is_open_folder = False
 
-            
         pass
 
     def on_save(self):
@@ -233,6 +232,9 @@ class Canvas(QMainWindow):
         # BUG：新增的东西可能会导致父文件夹形状炸开散架
         # 更新文件夹内容
         self.file_observer.root_folder.update_tree_content()
+        self.file_observer.folder_max_deep_index = (
+            self.file_observer.root_folder.count_deep_level()
+        )
         pass
 
     def on_import(self):
@@ -280,7 +282,6 @@ class Canvas(QMainWindow):
                 pass
             pass
 
-
     def paintEvent(self, a0: QPaintEvent | None):
         assert a0 is not None
         painter = QPainter(self)
@@ -309,11 +310,21 @@ class Canvas(QMainWindow):
         for folder_entity in self.file_observer.get_entity_folders():
             if folder_entity.body_shape.is_collision(self.camera.cover_world_rectangle):
                 # 获得一个世界坐标系的视野矩形，用于排除视野之外的绘制，防止放大了之后会卡
-                paint_folder_rect(painter, self.camera, folder_entity)
+                paint_folder_rect(
+                    painter,
+                    self.camera,
+                    folder_entity,
+                    folder_entity.deep_level / self.file_observer.folder_max_deep_index,
+                )
         # 后画文件
         for file_entity in self.file_observer.get_entity_files():
             if file_entity.body_shape.is_collision(self.camera.cover_world_rectangle):
-                paint_file_rect(painter, self.camera, file_entity)
+                paint_file_rect(
+                    painter,
+                    self.camera,
+                    file_entity,
+                    file_entity.deep_level / self.file_observer.folder_max_deep_index,
+                )
         # 绘制选中的区域
         if self.file_observer.dragging_entity:
             paint_selected_rect(

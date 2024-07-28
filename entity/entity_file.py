@@ -28,6 +28,7 @@ class EntityFile(Entity):
 
         self.full_path = full_path
         self.location = location_left_top
+        self.deep_level = 0  # 相对深度，0表示最外层
         self.body_shape = Rectangle(
             location_left_top, get_width_by_file_name(file_name), 100
         )

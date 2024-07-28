@@ -1,3 +1,4 @@
+from functools import lru_cache
 from PyQt5.QtGui import QPainter, QColor
 
 from camera import Camera
@@ -7,6 +8,7 @@ from entity.entity import Entity
 from entity.entity_file import EntityFile
 from entity.entity_folder import EntityFolder
 from paint.paint_utils import PainterUtils
+from tools.color_utils import mix_colors
 
 
 def paint_grid(paint: QPainter, camera: Camera):
@@ -96,7 +98,20 @@ def paint_rect_in_world(
     )
 
 
-def paint_file_rect(paint: QPainter, camera: Camera, entity_file: EntityFile):
+@lru_cache(maxsize=1000)
+def get_color_by_level(rate: int) -> QColor:
+    """
+    根据等级获取颜色
+    :param level:
+    :return:
+    """
+    return mix_colors((35, 170, 242), (76, 236, 45), rate)
+
+
+def paint_file_rect(
+    paint: QPainter, camera: Camera, entity_file: EntityFile, color_rate: float = 0.5
+):
+
     # 先画一个框
     PainterUtils.paint_rect_from_left_top(
         paint,
@@ -104,7 +119,7 @@ def paint_file_rect(paint: QPainter, camera: Camera, entity_file: EntityFile):
         entity_file.body_shape.width * camera.current_scale,
         entity_file.body_shape.height * camera.current_scale,
         QColor(0, 0, 0, 255),
-        QColor(255, 255, 255, 255),
+        get_color_by_level(color_rate),
     )
     # camera scale < 0.15 的时候不渲染文字了，会导致文字突然变大，重叠一大堆
     if camera.current_scale < 0.15:
@@ -112,10 +127,12 @@ def paint_file_rect(paint: QPainter, camera: Camera, entity_file: EntityFile):
     # 再画文字
     PainterUtils.paint_word_from_left_top(
         paint,
-        camera.location_world2view(entity_file.body_shape.location_left_top),
+        camera.location_world2view(
+            entity_file.body_shape.location_left_top + NumberVector(5, 5)
+        ),
         entity_file.file_name,
-        16 * camera.current_scale,
-        QColor(255, 255, 255, 255),
+        14 * camera.current_scale,
+        get_color_by_level(color_rate),
     )
 
     pass
@@ -142,7 +159,9 @@ def paint_selected_rect(
     )
 
 
-def paint_folder_rect(paint: QPainter, camera: Camera, entity_file: EntityFolder):
+def paint_folder_rect(
+    paint: QPainter, camera: Camera, entity_file: EntityFolder, color_rate: float = 0.5
+):
     """
 
     :param paint:
@@ -157,7 +176,7 @@ def paint_folder_rect(paint: QPainter, camera: Camera, entity_file: EntityFolder
         entity_file.body_shape.width * camera.current_scale,
         entity_file.body_shape.height * camera.current_scale,
         QColor(255, 255, 255, 0),
-        QColor(255, 255, 255, 255),
+        get_color_by_level(color_rate),
     )
     if camera.current_scale < 0.05:
         return
@@ -167,5 +186,5 @@ def paint_folder_rect(paint: QPainter, camera: Camera, entity_file: EntityFolder
         camera.location_world2view(entity_file.body_shape.location_left_top),
         entity_file.folder_name,
         16 * camera.current_scale,
-        QColor(255, 255, 255, 255),
+        get_color_by_level(color_rate),
     )
