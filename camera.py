@@ -111,6 +111,16 @@ class Camera:
             # 让 current_scale 逐渐靠近 target_scale
             if self.is_scale_animation_open:
                 self.current_scale += (self.target_scale - self.current_scale) / 10
+            
+            # 彩蛋，《微观尽头》——刘慈欣
+            SCALE_MAX = 1000
+            SCALE_MIN = 0.0001
+            if self.current_scale > SCALE_MAX:
+                self.current_scale = SCALE_MIN * 2
+                self.target_scale = SCALE_MIN * 2
+            elif self.current_scale < SCALE_MIN:
+                self.current_scale = SCALE_MAX - 1
+                self.target_scale = SCALE_MAX - 1
         except Exception as e:
             traceback.print_exc()
             print(e)
