@@ -4,15 +4,15 @@
 
 默认生成效果
 
-![默认生成效果](docs\show.png)
+![默认生成效果](docs/show.png)
 
 自定义摆放后
 
-![cannonwar-project](docs\cannonwar-project.jpg)
+![cannonwar-project](docs/cannonwar-project.jpg)
 
 放大细节
 
-![details](docs\details.jpg)
+![details](docs/details.jpg)
 
 ## 特点
 
@@ -30,7 +30,7 @@
 
 或者以一定的图案摆放，这样一看到我们自己摆放的图案，想到找某个文件就能立刻根据空间记忆立刻找到，双击即可打开。不需要再在一维的列表中来回上下翻找。
 
-![形状自由摆放](docs\shape.jpg)
+![形状自由摆放](docs/shape.jpg)
 
 如上所示，可以把这五个ts文件根据继承关系摆放成三角形，方便快速找到。
 
