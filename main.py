@@ -307,24 +307,8 @@ class Canvas(QMainWindow):
         # 画场景物体
 
         # 先画文件夹
-        for folder_entity in self.file_observer.get_entity_folders():
-            if folder_entity.body_shape.is_collision(self.camera.cover_world_rectangle):
-                # 获得一个世界坐标系的视野矩形，用于排除视野之外的绘制，防止放大了之后会卡
-                paint_folder_rect(
-                    painter,
-                    self.camera,
-                    folder_entity,
-                    folder_entity.deep_level / self.file_observer.folder_max_deep_index,
-                )
-        # 后画文件
-        for file_entity in self.file_observer.get_entity_files():
-            if file_entity.body_shape.is_collision(self.camera.cover_world_rectangle):
-                paint_file_rect(
-                    painter,
-                    self.camera,
-                    file_entity,
-                    file_entity.deep_level / self.file_observer.folder_max_deep_index,
-                )
+        if self.file_observer.root_folder:
+            self.paint_folder_dfs(painter, self.file_observer.root_folder)
         # 绘制选中的区域
         if self.file_observer.dragging_entity:
             paint_selected_rect(
@@ -342,6 +326,34 @@ class Canvas(QMainWindow):
                 f"drag locked: {self.file_observer.is_drag_locked}",
             ],
         )
+    
+    def paint_folder_dfs(self, painter: QPainter, folder_entity: EntityFolder):
+        """
+        递归绘制文件夹，遇到视野之外的直接排除
+        """
+        # 先绘制本体
+        if folder_entity.body_shape.is_collision(self.camera.cover_world_rectangle):
+            paint_folder_rect(
+                painter,
+                self.camera,                
+                folder_entity,
+                folder_entity.deep_level / self.file_observer.folder_max_deep_index,
+            )
+        else: 
+            return
+        # 递归绘制子文件夹
+        for child in folder_entity.children:
+            if isinstance(child, EntityFolder):
+                self.paint_folder_dfs(painter, child)
+            elif isinstance(child, EntityFile):
+                if child.body_shape.is_collision(self.camera.cover_world_rectangle):
+                    paint_file_rect(
+                        painter,
+                        self.camera,
+                        child,
+                        child.deep_level / self.file_observer.folder_max_deep_index,
+                    )
+        pass
 
     def mousePressEvent(self, a0: QMouseEvent | None):
         assert a0 is not None

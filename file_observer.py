@@ -97,16 +97,6 @@ class FileObserver:
                 res.extend(self._entity_folders(file))
         return res
 
-    def get_entity_folders(self) -> list[EntityFolder]:
-        if self.root_folder is None:
-            return []
-        return self._entity_folders(self.root_folder)
-
-    def get_entity_files(self) -> list[EntityFile]:
-        if self.root_folder is None:
-            return []
-        return self._entity_files(self.root_folder)
-
     def get_entity_by_location(
         self, location_world: NumberVector
     ) -> EntityFile | EntityFolder | None:
