@@ -194,7 +194,7 @@ class Canvas(QMainWindow):
         # 显示消息框
         msgBox.exec_()
 
-    def on_open_floder_finish_slot(self):
+    def on_open_folder_finish_slot(self):
         self._is_open_folder = False
 
     def on_open(self):
@@ -205,7 +205,7 @@ class Canvas(QMainWindow):
             # paint_alert_message(painter, self.camera, "请先打开文件夹")
             self._is_open_folder = True
             self._open_folder_thread = OpenFolderThread(self.file_observer, directory)
-            self._open_folder_thread.finished.connect(self.on_open_floder_finish_slot)
+            self._open_folder_thread.finished.connect(self.on_open_folder_finish_slot)
             self._open_folder_thread.start()
             # self.file_observer.update_file_path(directory)
             # self._is_open_folder = False
