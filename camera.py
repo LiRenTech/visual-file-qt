@@ -111,7 +111,7 @@ class Camera:
             # 让 current_scale 逐渐靠近 target_scale
             if self.is_scale_animation_open:
                 self.current_scale += (self.target_scale - self.current_scale) / 10
-            
+
             # 彩蛋，《微观尽头》——刘慈欣
             SCALE_MAX = 150
             SCALE_MIN = 0.001

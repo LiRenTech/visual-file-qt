@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (
     QMainWindow,
     QFileDialog,
     QMessageBox,
-    QProgressBar
+    QProgressBar,
 )
 from PyQt5.QtGui import (
     QPainter,
@@ -195,7 +195,7 @@ class Canvas(QMainWindow):
         msgBox.exec_()
 
     def on_open_floder_finish_slot(self):
-      self._is_open_folder = False
+        self._is_open_folder = False
 
     def on_open(self):
         # 直接读取文件
@@ -334,7 +334,7 @@ class Canvas(QMainWindow):
                 f"drag locked: {self.file_observer.is_drag_locked}",
             ],
         )
-    
+
     def paint_folder_dfs(self, painter: QPainter, folder_entity: EntityFolder):
         """
         递归绘制文件夹，遇到视野之外的直接排除
@@ -343,11 +343,11 @@ class Canvas(QMainWindow):
         if folder_entity.body_shape.is_collision(self.camera.cover_world_rectangle):
             paint_folder_rect(
                 painter,
-                self.camera,                
+                self.camera,
                 folder_entity,
                 folder_entity.deep_level / self.file_observer.folder_max_deep_index,
             )
-        else: 
+        else:
             return
         # 递归绘制子文件夹
         for child in folder_entity.children:
