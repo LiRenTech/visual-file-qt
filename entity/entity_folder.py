@@ -200,47 +200,51 @@ class EntityFolder(Entity):
 
         # 放置点位
         put_location = self.body_shape.location_left_top + NumberVector(0, 100)
+        try:
+            for file_name_sub in os.listdir(self.full_path):
+                full_path_sub = os.path.join(self.full_path, file_name_sub)
+                is_have = self._is_have_child(file_name_sub)
 
-        for file_name_sub in os.listdir(self.full_path):
-            full_path_sub = os.path.join(self.full_path, file_name_sub)
-            is_have = self._is_have_child(file_name_sub)
+                # 开始添加
+                if os.path.isdir(full_path_sub):
+                    # 排除的文件夹名字
+                    if file_name_sub in self.exclusion_list:
+                        continue
+                    if is_have:
+                        # 还要继续深入检查这个文件夹内部是否有更新
+                        for chile in self.children:
+                            if (
+                                isinstance(chile, EntityFolder)
+                                and chile.folder_name == file_name_sub
+                            ):
+                                # 找到这个原有的子文件夹并递归下去
+                                chile.update_tree_content()
+                                break
+                    else:
+                        # 新增了一个文件夹
+                        child_folder = EntityFolder(put_location, full_path_sub)
+                        put_location += NumberVector(500, 0)  # 往右放
 
-            # 开始添加
-            if os.path.isdir(full_path_sub):
-                # 排除的文件夹名字
-                if file_name_sub in self.exclusion_list:
-                    continue
-                if is_have:
-                    # 还要继续深入检查这个文件夹内部是否有更新
-                    for chile in self.children:
-                        if (
-                            isinstance(chile, EntityFolder)
-                            and chile.folder_name == file_name_sub
-                        ):
-                            # 找到这个原有的子文件夹并递归下去
-                            chile.update_tree_content()
-                            break
+                        child_folder.parent = self
+                        child_folder.deep_level = self.deep_level + 1
+
+                        self.children.append(child_folder)
+                        child_folder.update_tree_content()  # 递归调用
                 else:
-                    # 新增了一个文件夹
-                    child_folder = EntityFolder(put_location, full_path_sub)
-                    put_location += NumberVector(500, 0)  # 往右放
+                    if is_have:
+                        continue
+                    # 是一个文件
+                    child_file = EntityFile(put_location, full_path_sub, self)
+                    put_location = NumberVector(0, 120)  # 往下放
 
-                    child_folder.parent = self
-                    child_folder.deep_level = self.deep_level + 1
+                    child_file.parent = self
+                    child_file.deep_level = self.deep_level + 1
 
-                    self.children.append(child_folder)
-                    child_folder.update_tree_content()  # 递归调用
-            else:
-                if is_have:
-                    continue
-                # 是一个文件
-                child_file = EntityFile(put_location, full_path_sub, self)
-                put_location = NumberVector(0, 120)  # 往下放
-
-                child_file.parent = self
-                child_file.deep_level = self.deep_level + 1
-
-                self.children.append(child_file)
+                    self.children.append(child_file)
+        except PermissionError:
+            # 权限不足，跳过
+            # 这里或许未来可以加一种禁止访问的矩形，显示成灰色
+            pass
         pass
 
     def adjust(self):
