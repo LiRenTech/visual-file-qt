@@ -34,10 +34,14 @@ class FileObserver:
         :param new_path:
         :return:
         """
+
         self.folder_full_path = new_path
         self.root_folder = EntityFolder(NumberVector(0, 0), self.folder_full_path)
+        # 时间花费较少
         self.root_folder.update_tree_content()
+        # 时间花费较大，如果调整算法是O(n^2)，遇到文件夹里有上百个小文件会极慢
         self.root_folder.adjust_tree_location()
+
         self.dragging_entity = None
         # 还需要将新的文件夹移动到世界坐标的中心。
         target_location_left_top = NumberVector(0, 0) - NumberVector(

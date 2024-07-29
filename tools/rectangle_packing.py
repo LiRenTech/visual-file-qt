@@ -26,6 +26,7 @@ def sort_rectangle_just_vertical(
     """
     仅仅将一些矩形左对齐 竖向简单排列
     这会假设外层父文件夹左上角顶点为 0 0
+    O(N)
     :param rectangles:
     :param margin:
     :return:
@@ -43,7 +44,10 @@ def sort_rectangle_just_vertical(
 def sort_rectangle_greedy(
     rectangles: list[Rectangle], margin: float
 ) -> list[Rectangle]:
-    """贪心策略"""
+    """
+    贪心策略
+    O(N^2)
+    """
     if len(rectangles) == 0:
         return []
 
