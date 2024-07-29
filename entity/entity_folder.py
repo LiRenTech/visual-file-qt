@@ -4,7 +4,11 @@ from entity.entity import Entity
 from entity.entity_file import EntityFile
 from tools.string_tools import get_width_by_file_name
 from typing import Optional, Any
-from tools.rectangle_packing import sort_rectangle_greedy
+from tools.rectangle_packing import (
+    sort_rectangle_all_files,
+    sort_rectangle_greedy,
+    sort_rectangle_right_bottom,
+)
 
 
 class EntityFolder(Entity):
@@ -308,7 +312,14 @@ class EntityFolder(Entity):
         # 调整当前文件夹里的所有实体顺序位置
 
         rectangle_list = [child.body_shape for child in folder.children]
-        sorted_rectangle_list = sort_rectangle_greedy(
+
+        sort_strategy_function = (
+            sort_rectangle_greedy
+            if len(folder.children) < 100
+            else sort_rectangle_all_files
+        )
+
+        sorted_rectangle_list = sort_strategy_function(
             [rectangle.clone() for rectangle in rectangle_list], self.PADDING
         )
 

@@ -1,3 +1,4 @@
+import math
 from typing import List
 from data_struct.rectangle import Rectangle
 from data_struct.number_vector import NumberVector
@@ -145,6 +146,43 @@ def sort_rectangle_greedy(
         ret.append(min_rect)
 
     return ret
+
+
+def sort_rectangle_all_files(
+    rectangles: List[Rectangle], margin: float
+) -> list[Rectangle]:
+    """
+    专门解决一个文件夹里面全都是小文件的情况的矩形摆放位置的情况。
+    """
+    if len(rectangles) == 0:
+        return []
+
+    # 先找到所有矩形中最宽的矩形宽度
+    max_width = 0
+    for r in rectangles:
+        if r.width > max_width:
+            max_width = r.width
+
+    # 再找到所有矩形中最高的矩形高度
+    max_height = 0
+    for r in rectangles:
+        if r.height > max_height:
+            max_height = r.height
+
+    # 假设按照正方形摆放，不管宽高比例，边上的数量
+    count_in_side = math.ceil(len(rectangles) ** 0.5)
+    y_index = 0
+    x_index = 0
+
+    for rectangle in rectangles:
+        if x_index > count_in_side - 1:
+            x_index = 0
+            y_index += 1
+        rectangle.location_left_top.x = x_index * (max_width + margin)
+        rectangle.location_left_top.y = y_index * (max_height + margin)
+        x_index += 1
+
+    return rectangles
 
 
 def sort_rectangle_right_bottom(
