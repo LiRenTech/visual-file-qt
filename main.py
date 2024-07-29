@@ -196,6 +196,8 @@ class Canvas(QMainWindow):
 
     def on_open_folder_finish_slot(self):
         self._is_open_folder = False
+        self.camera.reset()
+        self.camera.target_scale = 0.1
 
     def on_open(self):
         # 直接读取文件
