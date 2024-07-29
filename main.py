@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import (
     QMainWindow,
     QFileDialog,
     QMessageBox,
+    QProgressBar
 )
 from PyQt5.QtGui import (
     QPainter,
@@ -43,6 +44,7 @@ from paint.paint_elements import (
     paint_selected_rect,
     paint_alert_message,
 )
+from tools.threads import OpenFolderThread
 
 
 class Canvas(QMainWindow):
@@ -192,6 +194,9 @@ class Canvas(QMainWindow):
         # 显示消息框
         msgBox.exec_()
 
+    def on_open_floder_finish_slot(self):
+      self._is_open_folder = False
+
     def on_open(self):
         # 直接读取文件
         directory = QFileDialog.getExistingDirectory(self, "选择要直观化查看的文件夹")
@@ -199,9 +204,11 @@ class Canvas(QMainWindow):
         if directory:
             # paint_alert_message(painter, self.camera, "请先打开文件夹")
             self._is_open_folder = True
-            time.sleep(0.5)
-            self.file_observer.update_file_path(directory)
-            self._is_open_folder = False
+            self._open_folder_thread = OpenFolderThread(self.file_observer, directory)
+            self._open_folder_thread.finished.connect(self.on_open_floder_finish_slot)
+            self._open_folder_thread.start()
+            # self.file_observer.update_file_path(directory)
+            # self._is_open_folder = False
 
         pass
 
@@ -301,6 +308,7 @@ class Canvas(QMainWindow):
             return
         if self._is_open_folder:
             paint_alert_message(painter, self.camera, "正在打开文件夹，请稍后...")
+            return
         # 如果没有文件夹，绘制提示信息
         if self.file_observer.root_folder is None:
             paint_alert_message(painter, self.camera, "请先打开文件夹")
