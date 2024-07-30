@@ -2,15 +2,13 @@ from data_struct.number_vector import NumberVector
 from data_struct.rectangle import Rectangle
 from entity.entity import Entity
 from entity.entity_file import EntityFile
+from tools.gitignore_parser import parse_gitignore
 from tools.string_tools import get_width_by_file_name
 from typing import Optional, Any
 from tools.rectangle_packing import (
     sort_rectangle_all_files,
-    sort_rectangle_fast,
     sort_rectangle_greedy,
-    sort_rectangle_right_bottom,
 )
-
 
 class EntityFolder(Entity):
     """
@@ -21,19 +19,8 @@ class EntityFolder(Entity):
 
     # 通用排除的文件夹
     exclusion_list = [
-        "__pycache__",
-        ".git",
-        ".idea",
-        "node_modules",
-        "dist",
-        "build",
-        "venv",
-        ".venv" "env",
-        "temp",
-        ".vscode",
-        "migrations",  # 数据库迁移文件
-        "logs",  # 日志文件
-        "cache",  # 缓存文件
+        ".git",  # gitignore文件本身不排除.git文件夹，所以这里强制排除
+        "__pycache__",  # 貌似出了一些bug parse_gitignore 没有排除这个文件夹
     ]
 
     def __init__(self, location_left_top: NumberVector, full_path: str):
@@ -202,8 +189,27 @@ class EntityFolder(Entity):
         # 放置点位
         put_location = self.body_shape.location_left_top + NumberVector(0, 100)
         try:
+            # 在遍历之前先看看是否有.gitignore文件
+            gitignore_file_path = os.path.join(self.full_path, ".gitignore").replace("\\", "/")
+
+            # 输入一个匹配函数，如果匹配则返回True，否则返回False
+            matches_function = lambda _: False
+
+            if os.path.exists(gitignore_file_path):
+                try:
+                    matches_function = parse_gitignore(gitignore_file_path)
+                except UnicodeDecodeError:
+                    print(f"文件{gitignore_file_path}编码错误，跳过")
+                    pass
+
+            # 遍历文件夹内所有文件
             for file_name_sub in os.listdir(self.full_path):
-                full_path_sub = os.path.join(self.full_path, file_name_sub)
+                full_path_sub = os.path.join(self.full_path, file_name_sub).replace("\\", "/")
+
+                # 是否是gitignore排除的文件
+                if matches_function(full_path_sub):
+                    continue
+
                 is_have = self._is_have_child(file_name_sub)
 
                 # 开始添加
