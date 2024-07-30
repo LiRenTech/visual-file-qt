@@ -319,7 +319,7 @@ class EntityFolder(Entity):
         rectangle_list = [child.body_shape for child in folder.children]
 
         sort_strategy_function = (
-            sort_rectangle_fast
+            sort_rectangle_greedy
             if len(folder.children) < 100
             else sort_rectangle_all_files
         )
