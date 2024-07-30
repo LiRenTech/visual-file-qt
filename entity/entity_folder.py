@@ -10,6 +10,7 @@ from tools.rectangle_packing import (
     sort_rectangle_greedy,
 )
 
+
 class EntityFolder(Entity):
     """
     文件夹矩形
@@ -190,7 +191,9 @@ class EntityFolder(Entity):
         put_location = self.body_shape.location_left_top + NumberVector(0, 100)
         try:
             # 在遍历之前先看看是否有.gitignore文件
-            gitignore_file_path = os.path.join(self.full_path, ".gitignore").replace("\\", "/")
+            gitignore_file_path = os.path.join(self.full_path, ".gitignore").replace(
+                "\\", "/"
+            )
 
             # 输入一个匹配函数，如果匹配则返回True，否则返回False
             matches_function = lambda _: False
@@ -204,7 +207,9 @@ class EntityFolder(Entity):
 
             # 遍历文件夹内所有文件
             for file_name_sub in os.listdir(self.full_path):
-                full_path_sub = os.path.join(self.full_path, file_name_sub).replace("\\", "/")
+                full_path_sub = os.path.join(self.full_path, file_name_sub).replace(
+                    "\\", "/"
+                )
 
                 # 是否是gitignore排除的文件
                 if matches_function(full_path_sub):

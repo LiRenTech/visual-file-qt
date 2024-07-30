@@ -41,25 +41,25 @@ def sort_rectangle_just_vertical(
 
     return rectangles
 
-def sort_rectangle_fast(
-    rectangles: list[Rectangle], margin: float
-) -> list[Rectangle]:
-  max_width = -margin
-  max_height = -margin
-  putable_locs = [NumberVector(0, 0)]
-  for r in rectangles:
-    if max_width > max_height:
-        r.location_left_top.y = max_height + margin
-        r.location_left_top.x = 0
-    else:
-        r.location_left_top.x = max_width + margin
-        r.location_left_top.y = 0
-    if r.right() > max_width:
-      max_width = r.right()
-    if r.bottom() > max_height:
-      max_height = r.bottom()
-  return rectangles
-  
+
+def sort_rectangle_fast(rectangles: list[Rectangle], margin: float) -> list[Rectangle]:
+    max_width = -margin
+    max_height = -margin
+    putable_locs = [NumberVector(0, 0)]
+    for r in rectangles:
+        if max_width > max_height:
+            r.location_left_top.y = max_height + margin
+            r.location_left_top.x = 0
+        else:
+            r.location_left_top.x = max_width + margin
+            r.location_left_top.y = 0
+        if r.right() > max_width:
+            max_width = r.right()
+        if r.bottom() > max_height:
+            max_height = r.bottom()
+    return rectangles
+
+
 def sort_rectangle_greedy(
     rectangles: list[Rectangle], margin: float
 ) -> list[Rectangle]:
