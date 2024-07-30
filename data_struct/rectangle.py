@@ -73,9 +73,25 @@ class Rectangle:
             self.location_left_top.y + self.height / 2,
         )
 
-    def is_collision(self, rect: "Rectangle") -> bool:
-        collision_x = self.right() >= rect.left() and rect.right() >= self.left()
-        collision_y = self.bottom() >= rect.top() and rect.bottom() >= self.top()
+    def is_collision(self, rect: "Rectangle", margin: float = 0) -> bool:
+        """判断self是否与rect之间的最小边距小于margin。
+        当margin=0时，此时为判断self与rect是否重叠
+
+        Args:
+            rect (Rectangle): 待判断的矩形
+            margin (float, optional): 判断的边距，当边距等于0时，为碰撞检测. Defaults to 0.
+
+        Returns:
+            bool: self是否与rect之间的最小边距小于margin
+        """
+        collision_x = (
+            self.right() - rect.left() > -margin
+            and rect.right() - self.left() > -margin
+        )
+        collision_y = (
+            self.bottom() - rect.top() > -margin
+            and rect.bottom() - self.top() > -margin
+        )
         return collision_x and collision_y
 
     def is_contain(self, rect: "Rectangle") -> bool:

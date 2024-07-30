@@ -41,7 +41,25 @@ def sort_rectangle_just_vertical(
 
     return rectangles
 
-
+def sort_rectangle_fast(
+    rectangles: list[Rectangle], margin: float
+) -> list[Rectangle]:
+  max_width = -margin
+  max_height = -margin
+  putable_locs = [NumberVector(0, 0)]
+  for r in rectangles:
+    if max_width > max_height:
+        r.location_left_top.y = max_height + margin
+        r.location_left_top.x = 0
+    else:
+        r.location_left_top.x = max_width + margin
+        r.location_left_top.y = 0
+    if r.right() > max_width:
+      max_width = r.right()
+    if r.bottom() > max_height:
+      max_height = r.bottom()
+  return rectangles
+  
 def sort_rectangle_greedy(
     rectangles: list[Rectangle], margin: float
 ) -> list[Rectangle]:
@@ -67,8 +85,11 @@ def sort_rectangle_greedy(
         while collision:
             collision = False
             for r in rects:
-                if ret.is_collision(r):
+                if ret.is_collision(r, margin=margin):
                     ret.location_left_top.y = r.bottom() + margin
+                    ret.location_left_top.x = max(
+                        ret.location_left_top.x, r.right() + margin
+                    )
                     collision = True
                     break
         return ret
@@ -88,8 +109,11 @@ def sort_rectangle_greedy(
         while collision:
             collision = False
             for r in rects:
-                if ret.is_collision(r):
+                if ret.is_collision(r, margin=margin):
                     ret.location_left_top.x = r.right() + margin
+                    ret.location_left_top.y = max(
+                        ret.location_left_top.y, r.bottom() + margin
+                    )
                     collision = True
                     break
         return ret
@@ -99,21 +123,7 @@ def sort_rectangle_greedy(
     ret = [rectangles[0]]
     width = rectangles[0].width
     height = rectangles[0].height
-    # index = 0
     for i in range(1, len(rectangles)):
-        # if width < height:
-        #     rectangles[i] = append_right(rectangles[index], rectangles[i], ret)
-        #     w = rectangles[i].right()
-        #     if w > width:
-        #         width = w
-        #         index = i
-        # else:
-        #     rectangles[i] = append_bottom(rectangles[index], rectangles[i], ret)
-        #     h = rectangles[i].bottom()
-        #     if h > height:
-        #         height = h
-        #         index = i
-        # ret.append(rectangles[i])
         min_space_score = -1
         min_shape_score = -1
         min_rect = None
