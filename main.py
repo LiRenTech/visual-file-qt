@@ -33,6 +33,7 @@ from camera import Camera
 from data_struct.number_vector import NumberVector
 from entity.entity_file import EntityFile
 from entity.entity_folder import EntityFolder
+from exclude_dialog import ExcludeDialog
 from file_observer import FileObserver
 from file_openner import open_file
 from paint.paint_elements import (
@@ -97,6 +98,12 @@ class Canvas(QMainWindow):
         update_action.setShortcut("Ctrl+U")
         folder_menu.addAction(update_action)
         update_action.triggered.connect(self.on_update)
+
+        # 创建 设置排除 菜单项
+        exclude_action = QAction("设置排除", self)
+        exclude_action.setShortcut("Ctrl+E")
+        folder_menu.addAction(exclude_action)
+        exclude_action.triggered.connect(self.show_exclude_dialog)
 
         # “布局”菜单
         layout_menu = menubar.addMenu("布局")
@@ -178,6 +185,10 @@ class Canvas(QMainWindow):
         # 计算窗口的左上角位置以使其居中
         window_top_left = screen_center - window_center
         self.move(window_top_left)
+
+    def show_exclude_dialog(self):
+        dialog = ExcludeDialog(self)
+        dialog.exec_()
 
     @staticmethod
     def on_help():

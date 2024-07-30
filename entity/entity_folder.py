@@ -9,6 +9,7 @@ from tools.rectangle_packing import (
     sort_rectangle_all_files,
     sort_rectangle_greedy,
 )
+from exclude_manager import EXCLUDE_MANAGER
 
 
 class EntityFolder(Entity):
@@ -22,6 +23,7 @@ class EntityFolder(Entity):
     exclusion_list = [
         ".git",  # gitignore文件本身不排除.git文件夹，所以这里强制排除
         "__pycache__",  # 貌似出了一些bug parse_gitignore 没有排除这个文件夹
+        ".idea",
     ]
 
     def __init__(self, location_left_top: NumberVector, full_path: str):
@@ -190,28 +192,31 @@ class EntityFolder(Entity):
         # 放置点位
         put_location = self.body_shape.location_left_top + NumberVector(0, 100)
         try:
-            # 在遍历之前先看看是否有.gitignore文件
-            gitignore_file_path = os.path.join(self.full_path, ".gitignore").replace(
-                "\\", "/"
-            )
-
             # 输入一个匹配函数，如果匹配则返回True，否则返回False
             matches_function = lambda _: False
 
-            if os.path.exists(gitignore_file_path):
-                try:
-                    matches_function = parse_gitignore(gitignore_file_path)
-                except UnicodeDecodeError:
-                    print(f"文件{gitignore_file_path}编码错误，跳过")
-                    pass
+            if EXCLUDE_MANAGER.is_local_exclude:
+                # 在遍历之前先看看是否有.gitignore文件
+                gitignore_file_path = os.path.join(
+                    self.full_path, ".gitignore"
+                ).replace("\\", "/")
+
+                if os.path.exists(gitignore_file_path):
+                    try:
+                        matches_function = parse_gitignore(gitignore_file_path)
+                    except UnicodeDecodeError:
+                        # 这个不会再发生了，因为已经将这个第三方库放到本地并修改了代码了
+                        print(f"文件{gitignore_file_path}编码错误，跳过")
 
             # 遍历文件夹内所有文件
             for file_name_sub in os.listdir(self.full_path):
                 full_path_sub = os.path.join(self.full_path, file_name_sub).replace(
                     "\\", "/"
                 )
-
-                # 是否是gitignore排除的文件
+                # 全局排除
+                if EXCLUDE_MANAGER.is_file_in_global_exclude(full_path_sub):
+                    continue
+                # 局部排除
                 if matches_function(full_path_sub):
                     continue
 
@@ -219,9 +224,6 @@ class EntityFolder(Entity):
 
                 # 开始添加
                 if os.path.isdir(full_path_sub):
-                    # 排除的文件夹名字
-                    if file_name_sub in self.exclusion_list:
-                        continue
                     if is_have:
                         # 还要继续深入检查这个文件夹内部是否有更新
                         for chile in self.children:
