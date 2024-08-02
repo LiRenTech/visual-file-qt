@@ -163,3 +163,4 @@ class Camera:
             view_location - NumberVector(self.view_width / 2, self.view_height / 2)
         ) / self.current_scale
         return v + self.location
+    

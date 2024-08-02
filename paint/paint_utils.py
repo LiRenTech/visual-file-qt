@@ -3,7 +3,7 @@
 """
 
 from PyQt5.QtCore import QPoint, Qt
-from PyQt5.QtGui import QPainter, QColor, QPen, QFont, QFontMetrics
+from PyQt5.QtGui import QPainter, QColor, QPen, QFont, QFontMetrics, QTransform
 
 from data_struct.number_vector import NumberVector
 import traceback
@@ -132,12 +132,23 @@ class PainterUtils:
             painter.setFont(font)
             painter.setPen(color)
 
+            # 计算字体的ascent值，即基线到顶的距离
+
+            # transform = QTransform()
+            # factor = font_size / 20
+            factor = 1
+            ascent = font_metrics.ascent() * factor
+            # transform.translate(left_top.x, left_top.y + ascent).scale(
+            #     factor, factor
+            # )
+            # painter.setTransform(transform)
+
+            # painter.drawText(QPoint(0, 0), text)
+
+            # painter.resetTransform()
             # 转换left_top为整数坐标
             left_top = left_top.integer()
             left_top = QPoint(int(left_top.x), int(left_top.y))
-
-            # 计算字体的ascent值，即基线到顶的距离
-            ascent = font_metrics.ascent()
 
             # 调整y坐标，使文本的左上角对齐
             adjusted_y = left_top.y() + ascent
