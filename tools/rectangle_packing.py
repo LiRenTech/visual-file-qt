@@ -158,11 +158,38 @@ def sort_rectangle_greedy(
     return ret
 
 
+def sort_rectangle_many_files_less_folders(
+    rectangles: List[Rectangle], margin: float
+) -> list[Rectangle]:
+    """
+    多文件,少文件夹的情况
+    文件夹排在左上角，只拍成一行
+    文件另起一行以矩阵形式排列
+    """
+    # 如何判定一个文件是文件夹还是文件？矩形的高度=100是文件，>100是文件夹
+    files = [r for r in rectangles if r.height <= 100]
+    folders = [r for r in rectangles if r.height > 100]
+    files = sort_rectangle_all_files(files, margin)
+    folders = sort_rectangle_all_files(folders, margin)
+    # 找到文件夹列表中最靠左下角的那个文件夹矩形的左下角坐标
+    min_x = min(folders, key=lambda r: r.location_left_top.x).location_left_top.x
+    
+    max_bottom_folder = max(folders, key=lambda r: r.bottom())
+
+    max_y = max_bottom_folder.bottom() + margin
+    for file in files:
+        file.location_left_top.x += min_x
+        file.location_left_top.y += max_y
+    # 看似没排，其实是排好了
+    return rectangles
+    pass
+
 def sort_rectangle_all_files(
     rectangles: List[Rectangle], margin: float
 ) -> list[Rectangle]:
     """
     专门解决一个文件夹里面全都是小文件的情况的矩形摆放位置的情况。
+    注：这种情况只适用于全是文件，没有文件夹的情况。
     """
     if len(rectangles) == 0:
         return []
