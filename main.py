@@ -174,17 +174,19 @@ class Canvas(QMainWindow):
         pass
 
     def _move_window_to_center(self):
-        # 获取屏幕的尺寸和中心位置
-        screen = QDesktopWidget().screenGeometry()
-        screen_center = screen.center()
+        # 获取屏幕可用空间（macOS上会有titlebar占据一部分空间）
+        screen_geometry = QDesktopWidget().availableGeometry()
 
-        # 计算窗口的中心位置
-        window_size = self.geometry().size()
-        window_center = QPoint(window_size.width() // 2, window_size.height() // 2)
+        # 计算新的宽度和高度（长宽各取屏幕的百分之八十）
+        new_width = screen_geometry.width() * 0.8
+        new_height = screen_geometry.height() * 0.8
 
-        # 计算窗口的左上角位置以使其居中
-        window_top_left = screen_center - window_center
-        self.move(window_top_left)
+        # 计算窗口应该移动到的新位置
+        new_left = (screen_geometry.width() - new_width) / 2
+        new_top = (screen_geometry.height() - new_height) / 2 + screen_geometry.top()
+
+        # 移动窗口到新位置
+        self.setGeometry(int(new_left),int(new_top), int(new_width), int(new_height))
 
     def show_exclude_dialog(self):
         dialog = ExcludeDialog(self)
