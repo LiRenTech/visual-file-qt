@@ -212,4 +212,3 @@ class PainterUtils:
 
             traceback.print_exc()
 
-    pass

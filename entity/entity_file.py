@@ -2,12 +2,16 @@
 文件矩形实体
 """
 
-from typing import Any
+from typing import Any, List
 from data_struct.number_vector import NumberVector
 from data_struct.rectangle import Rectangle
 from entity.entity import Entity
 
+from paint.paint_utils import PainterUtils
+from paint.paintables import PaintContext, Paintable
+from tools.color_utils import get_color_by_level
 from tools.string_tools import get_width_by_file_name
+from PyQt5.QtGui import QColor
 
 
 class EntityFile(Entity):
@@ -83,3 +87,33 @@ class EntityFile(Entity):
 
     def __repr__(self):
         return f"({self.file_name})"
+
+    def children(self) -> List[Paintable]:
+        return []
+
+    def paint(self, context: PaintContext) -> None:
+        # 先画一个框
+        context.painter.paint_rect(self.body_shape)
+        # PainterUtils.paint_rect_from_left_top(
+        #     paint,
+        #     self.body_shape.location_left_top,
+        #     self.body_shape.width,
+        #     self.body_shape.height,
+        #     QColor(0, 0, 0, 255),
+        #     get_color_by_level(color_rate),
+        # )
+        # camera scale < 0.15 的时候不渲染文字了，会导致文字突然变大，重叠一大堆
+        # if camera.current_scale < 0.15:
+        #     return
+        # 再画文字
+        context.painter.paint_text(
+            self.body_shape.location_left_top + NumberVector(5, 5),
+            self.file_name
+        )
+        # PainterUtils.paint_word_from_left_top(
+        #     paint,
+        #     self.body_shape.location_left_top + NumberVector(5, 5),
+        #     self.file_name,
+        #     14,
+        #     get_color_by_level(color_rate),
+        # )

@@ -2,9 +2,10 @@ from data_struct.number_vector import NumberVector
 from data_struct.rectangle import Rectangle
 from entity.entity import Entity
 from entity.entity_file import EntityFile
+from paint.paintables import PaintContext, Paintable
 from tools.gitignore_parser import parse_gitignore
 from tools.string_tools import get_width_by_file_name
-from typing import Optional, Any
+from typing import List, Optional, Any
 from tools.rectangle_packing import (
     sort_rectangle_all_files,
     sort_rectangle_greedy,
@@ -366,4 +367,28 @@ class EntityFolder(Entity):
     def __repr__(self):
         return f"({self.full_path})"
 
-    pass
+    def children(self) -> List[Paintable]:
+        return self.children
+
+    def paint(self, context: PaintContext) -> None:
+        # 先画一个框
+        context.painter.paint_rect(self.body_shape)
+        # PainterUtils.paint_rect_from_left_top(
+        #     paint,
+        #     camera.location_world2view(entity_file.body_shape.location_left_top),
+        #     entity_file.body_shape.width * camera.current_scale,
+        #     entity_file.body_shape.height * camera.current_scale,
+        #     QColor(255, 255, 255, 0),
+        #     get_color_by_level(color_rate),
+        # )
+        # if camera.current_scale < 0.05:
+        #     return
+        # 再画文字
+        context.painter.paint_text(self.body_shape.location_left_top, self.folder_name)
+        # PainterUtils.paint_word_from_left_top(
+        #     paint,
+        #     camera.location_world2view(entity_file.body_shape.location_left_top),
+        #     entity_file.folder_name,
+        #     16 * camera.current_scale,
+        #     get_color_by_level(color_rate),
+        # )

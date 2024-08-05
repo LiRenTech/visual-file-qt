@@ -1,22 +1,29 @@
 from PyQt5.QtGui import QPainter, QColor, QPen, QFont, QFontMetrics, QTransform
+from PyQt5.QtCore import QRectF, QPointF
 
 from data_struct.number_vector import NumberVector
+from data_struct.rectangle import Rectangle
+
 
 # 施工中...
 class VisualFilePainter:
     def __init__(self, painter: QPainter):
         self._painter = painter
 
-    def paint_solid_line(
-        self, point1: NumberVector, point2: NumberVector, color: QColor, width: float
-    ):
-        pen = QPen(color, width)  # 创建QPen并设置颜色和宽度
-        self._painter.setPen(pen)
-        self._painter.setBrush(color)
-        self._painter.setRenderHint(QPainter.Antialiasing)
-        self._painter.drawLine(
-            int(point1.x), int(point1.y), int(point2.x), int(point2.y)
+    def painter(self) -> QPainter:
+        return self._painter
+
+    def paint_rect(self, rect: Rectangle):
+        self._painter.drawRect(
+            QRectF(
+                rect.location_left_top.x,
+                rect.location_left_top.y,
+                rect.width,
+                rect.height,
+            )
         )
-        self._painter.setPen(QColor(0, 0, 0, 0))
-        self._painter.setBrush(QColor(0, 0, 0, 0))
-        self._painter.setRenderHint(QPainter.Antialiasing, False)
+    
+    def paint_text(self, left_top: NumberVector, text: str):
+        ascent = self._painter.fontMetrics().ascent()
+        self._painter.drawText(QPointF(left_top.x, left_top.y + ascent), text)
+    
