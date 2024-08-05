@@ -19,6 +19,9 @@ def open_file(full_path_file: str):
         print("当前系统：", os.name)
         if os.name == "win32" or os.name == "nt":
             os.startfile(full_path_file)
+        elif os.name == "posix":
+            # macOS 系统
+            os.system(f"open {full_path_file}")
         else:
             # linux 系统
             os.system(f"xdg-open {full_path_file}")
