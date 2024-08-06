@@ -3,6 +3,7 @@ from PyQt5.QtCore import QRectF, QPointF
 
 from data_struct.number_vector import NumberVector
 from data_struct.rectangle import Rectangle
+from data_struct.text import Text
 
 
 # 施工中...
@@ -10,7 +11,7 @@ class VisualFilePainter:
     def __init__(self, painter: QPainter):
         self._painter = painter
 
-    def painter(self) -> QPainter:
+    def q_painter(self) -> QPainter:
         return self._painter
 
     def paint_rect(self, rect: Rectangle):
@@ -23,7 +24,7 @@ class VisualFilePainter:
             )
         )
     
-    def paint_text(self, left_top: NumberVector, text: str):
+    def paint_text(self, text: Text):
         ascent = self._painter.fontMetrics().ascent()
-        self._painter.drawText(QPointF(left_top.x, left_top.y + ascent), text)
+        self._painter.drawText(QPointF(text.left_top.x, text.left_top.y + ascent), text.text)
     

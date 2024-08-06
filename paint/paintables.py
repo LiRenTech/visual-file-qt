@@ -21,12 +21,14 @@ class Paintable(metaclass=ABCMeta):
     """代表了所有能绘制的一个对象"""
 
     @abstractmethod
-    def children(self) -> List["Paintable"]:
+    def get_components(self) -> List["Paintable"]:
+        """获取该对象的基本图元，如没有，返回空列表
+        """
         pass
 
     @abstractmethod
     def paint(self, context: PaintContext) -> None:
-        """使用context绘制本对象，不包括该对象的子对象
+        """使用context绘制本对象，
 
         Args:
             context (PaintContext): 待使用的context
