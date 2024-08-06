@@ -1,10 +1,12 @@
 from data_struct.number_vector import NumberVector
 from data_struct.rectangle import Rectangle
+from data_struct.text import Text
 from entity.entity import Entity
 from entity.entity_file import EntityFile
+from paint.paintables import PaintContext, Paintable
 from tools.gitignore_parser import parse_gitignore
 from tools.string_tools import get_width_by_file_name
-from typing import Optional, Any
+from typing import List, Optional, Any
 from tools.rectangle_packing import (
     sort_rectangle_all_files,
     sort_rectangle_greedy,
@@ -371,4 +373,9 @@ class EntityFolder(Entity):
     def __repr__(self):
         return f"({self.full_path})"
 
-    pass
+    def get_components(self) -> List[Paintable]:
+        return []
+
+    def paint(self, context: PaintContext) -> None:
+       context.painter.paint_rect(self.body_shape)
+       context.painter.paint_text(Text(self.body_shape.location_left_top, self.folder_name))

@@ -45,6 +45,9 @@ from paint.paint_elements import (
     paint_selected_rect,
     paint_alert_message,
 )
+from paint.paintables import PaintContext
+from paint.painters import VisualFilePainter
+from style.styles import EntityFolderDefaultStyle
 from tools.threads import OpenFolderThread
 
 
@@ -186,7 +189,7 @@ class Canvas(QMainWindow):
         new_top = (screen_geometry.height() - new_height) / 2 + screen_geometry.top()
 
         # 移动窗口到新位置
-        self.setGeometry(int(new_left),int(new_top), int(new_width), int(new_height))
+        self.setGeometry(int(new_left), int(new_top), int(new_width), int(new_height))
 
     def show_exclude_dialog(self):
         dialog = ExcludeDialog(self)
@@ -331,7 +334,13 @@ class Canvas(QMainWindow):
 
         # 先画文件夹
         if self.file_observer.root_folder:
-            self.paint_folder_dfs(painter, self.file_observer.root_folder)
+            # self.paint_folder_dfs(painter, self.file_observer.root_folder)
+            folder_style = EntityFolderDefaultStyle(
+                self.file_observer.root_folder, self.file_observer.folder_max_deep_index
+            )
+            painter.setTransform(self.camera.get_world2view_transform())
+            folder_style.paint_objects(PaintContext(VisualFilePainter(painter), self.camera))
+            painter.resetTransform()
         # 绘制选中的区域
         if self.file_observer.dragging_entity:
             paint_selected_rect(

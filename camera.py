@@ -2,6 +2,7 @@ from data_struct.number_vector import NumberVector
 import traceback
 
 from data_struct.rectangle import Rectangle
+from PyQt5.QtGui import QTransform
 
 
 class Camera:
@@ -163,3 +164,11 @@ class Camera:
             view_location - NumberVector(self.view_width / 2, self.view_height / 2)
         ) / self.current_scale
         return v + self.location
+
+    def get_world2view_transform(self) -> QTransform:
+        q_translate_center = QTransform().translate(-self.location.x, -self.location.y)
+        q_sacle = QTransform().scale(self.current_scale, self.current_scale)
+        q_translate_offset = QTransform().translate(
+            self.view_width / 2, self.view_height / 2
+        )
+        return q_translate_center * q_sacle * q_translate_offset

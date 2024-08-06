@@ -8,7 +8,7 @@ from entity.entity import Entity
 from entity.entity_file import EntityFile
 from entity.entity_folder import EntityFolder
 from paint.paint_utils import PainterUtils
-from tools.color_utils import mix_colors
+from tools.color_utils import get_color_by_level, mix_colors
 
 
 def paint_grid(paint: QPainter, camera: Camera):
@@ -96,16 +96,6 @@ def paint_rect_in_world(
         fill_color,
         stroke_color,
     )
-
-
-@lru_cache(maxsize=1000)
-def get_color_by_level(rate: int) -> QColor:
-    """
-    根据等级获取颜色
-    :param level:
-    :return:
-    """
-    return mix_colors((35, 170, 242), (76, 236, 45), rate)
 
 
 def paint_file_rect(

@@ -1,10 +1,11 @@
-from abc import ABC, abstractmethod
+from abc import ABC, ABCMeta, abstractmethod
 
 from data_struct.number_vector import NumberVector
 from data_struct.rectangle import Rectangle
+from paint.paintables import Paintable
 
 
-class Entity:
+class Entity(Paintable, metaclass=ABCMeta):
     """
     实体类
     场景里参与碰撞检测的都算实体

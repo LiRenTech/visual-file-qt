@@ -2,12 +2,17 @@
 文件矩形实体
 """
 
-from typing import Any
+from typing import Any, List
 from data_struct.number_vector import NumberVector
 from data_struct.rectangle import Rectangle
+from data_struct.text import Text
 from entity.entity import Entity
 
+from paint.paint_utils import PainterUtils
+from paint.paintables import PaintContext, Paintable
+from tools.color_utils import get_color_by_level
 from tools.string_tools import get_width_by_file_name
+from PyQt5.QtGui import QColor
 
 
 class EntityFile(Entity):
@@ -83,3 +88,12 @@ class EntityFile(Entity):
 
     def __repr__(self):
         return f"({self.file_name})"
+
+    def get_components(self) -> List[Paintable]:
+        return []
+
+    def paint(self, context: PaintContext) -> None:
+        context.painter.paint_rect(self.body_shape)
+        context.painter.paint_text(
+            Text(self.body_shape.location_left_top + NumberVector(5, 5), self.file_name)
+        )
