@@ -4,6 +4,7 @@ from entity.entity_file import EntityFile
 from entity.entity_folder import EntityFolder
 from paint.paintables import PaintContext
 from PyQt5.QtGui import QPainter, QColor, QFont, QPen
+from queue import Queue
 
 from tools.color_utils import get_color_by_level
 
@@ -57,12 +58,38 @@ class EntityFolderDefaultStyle(Styleable):
                         q.setFont(QFont("Consolas", 14))
                     child.paint(context)
 
+    def _paint_folder_bfs(self, context: PaintContext, folder: EntityFolder) -> None:
+        q = context.painter.q_painter()
+        queue = Queue()
+        queue.put(folder)
+        files: list[EntityFile] = []
+        last_height = -1
+        while not queue.empty():
+            entity = queue.get()
+            if isinstance(entity, EntityFolder):
+                if entity.deep_level != last_height:
+                    color_rate = entity.deep_level / self.folder_max_deep_index
+                    last_height = entity.deep_level
+                    q.setPen(QPen(get_color_by_level(color_rate), 1 / context.camera.current_scale))
+                entity.paint(context)
+                for child in entity.children:
+                    queue.put(child)
+            elif isinstance(entity, EntityFile):
+                files.append(entity)
+        q.setFont(QFont("Consolas", 14))
+        for file in files:
+            if file.deep_level != last_height:
+                color_rate = file.deep_level / self.folder_max_deep_index
+                last_height = file.deep_level
+                q.setPen(QPen(get_color_by_level(color_rate), 1 / context.camera.current_scale))
+            file.paint(context)
+
     def paint_objects(self, context: PaintContext) -> None:
         q = context.painter.q_painter()
         q.setBrush(QColor(255, 255, 255, 0))
         q.setRenderHint(QPainter.Antialiasing)
         q.setFont(QFont("Consolas", 16))
-        self._paint_folder_dfs(context, self.root_folder)
+        self._paint_folder_bfs(context, self.root_folder)
         q.setPen(QColor(0, 0, 0, 0))
         q.setBrush(QColor(0, 0, 0, 0))
         q.setRenderHint(QPainter.Antialiasing, False)
