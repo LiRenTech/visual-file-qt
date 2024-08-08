@@ -1,10 +1,10 @@
 from abc import ABCMeta, abstractmethod
+from asyncio import Queue
 
 from entity.entity_file import EntityFile
 from entity.entity_folder import EntityFolder
 from paint.paintables import PaintContext
 from PyQt5.QtGui import QPainter, QColor, QFont, QPen
-from queue import Queue
 
 from tools.color_utils import get_color_by_level
 
