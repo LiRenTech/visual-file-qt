@@ -10,6 +10,7 @@ from typing import List, Optional, Any
 from tools.rectangle_packing import (
     sort_rectangle_all_files,
     sort_rectangle_greedy,
+    sort_rectangle_many_files_less_folders,
 )
 from exclude_manager import EXCLUDE_MANAGER
 
@@ -332,12 +333,16 @@ class EntityFolder(Entity):
         # 调整当前文件夹里的所有实体顺序位置
 
         rectangle_list = [child.body_shape for child in folder.children]
-
-        sort_strategy_function = (
-            sort_rectangle_greedy
-            if len(folder.children) < 100
-            else sort_rectangle_all_files
-        )
+        if len(folder.children) < 100:
+            sort_strategy_function = sort_rectangle_greedy
+        else:
+            if all(isinstance(child, EntityFolder) for child in folder.children) or all(
+                isinstance(child, EntityFile) for child in folder.children
+            ):
+                # 如果全是文件夹或者全是文件，按照正常的矩形排列
+                sort_strategy_function = sort_rectangle_all_files
+            else:
+                sort_strategy_function = sort_rectangle_many_files_less_folders
 
         sorted_rectangle_list = sort_strategy_function(
             [rectangle.clone() for rectangle in rectangle_list], self.PADDING
