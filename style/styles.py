@@ -59,6 +59,8 @@ class EntityFolderDefaultStyle(Styleable):
                     child.paint(context)
 
     def _paint_folder_bfs(self, context: PaintContext, folder: EntityFolder) -> None:
+        """还有bug，暂时先别用
+        """
         q = context.painter.q_painter()
         queue = Queue()
         queue.put(folder)
@@ -89,7 +91,7 @@ class EntityFolderDefaultStyle(Styleable):
         q.setBrush(QColor(255, 255, 255, 0))
         q.setRenderHint(QPainter.Antialiasing)
         q.setFont(QFont("Consolas", 16))
-        self._paint_folder_bfs(context, self.root_folder)
+        self._paint_folder_dfs(context, self.root_folder)
         q.setPen(QColor(0, 0, 0, 0))
         q.setBrush(QColor(0, 0, 0, 0))
         q.setRenderHint(QPainter.Antialiasing, False)
