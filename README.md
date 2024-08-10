@@ -74,7 +74,10 @@ pyrcc5 -o assets/image.rcc -o assets/assets.py
 打包指令
 
 ```commandline
+windows:
 pyinstaller --onefile --windowed --icon=./assets/favicon.ico main.py -n visual-file
+macOS:
+pyinstaller --onefile --windowed --icon=./assets/visual-file.icns main.py -n visual-file
 ```
 
 ## 布局文件格式
