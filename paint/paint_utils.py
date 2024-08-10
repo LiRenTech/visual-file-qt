@@ -2,11 +2,12 @@
 这个里面绘制的元素都是直接基于渲染坐标来绘制的，不是世界坐标
 """
 
+import traceback
+
 from PyQt5.QtCore import QPoint, QPointF, Qt
-from PyQt5.QtGui import QPainter, QColor, QPen, QFont, QFontMetrics, QTransform
+from PyQt5.QtGui import QPainter, QColor, QPen, QFont, QFontMetrics
 
 from data_struct.number_vector import NumberVector
-import traceback
 
 
 class PainterUtils:
@@ -193,7 +194,7 @@ class PainterUtils:
 
             # 获取文本的宽度和高度
             text_width = font_metrics.width(text)
-            text_height = font_metrics.height()
+            # text_height = font_metrics.height()
             ascent = font_metrics.ascent()
 
             # 计算文本中心点相对于左上角的位置
@@ -211,4 +212,3 @@ class PainterUtils:
             import traceback
 
             traceback.print_exc()
-

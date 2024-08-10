@@ -1,8 +1,9 @@
-from typing import Any, List
+from typing import Any
+
 from data_struct.number_vector import NumberVector
 
 
-class Rectangle():
+class Rectangle:
     def __init__(self, location_left_top: NumberVector, width: float, height: float):
         self.location_left_top = location_left_top
         self.width: float = width

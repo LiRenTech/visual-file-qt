@@ -3,16 +3,13 @@
 """
 
 from typing import Any, List
+
 from data_struct.number_vector import NumberVector
 from data_struct.rectangle import Rectangle
 from data_struct.text import Text
 from entity.entity import Entity
-
-from paint.paint_utils import PainterUtils
 from paint.paintables import PaintContext, Paintable
-from tools.color_utils import get_color_by_level
 from tools.string_tools import get_width_by_file_name
-from PyQt5.QtGui import QColor
 
 
 class EntityFile(Entity):

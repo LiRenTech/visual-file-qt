@@ -1,17 +1,7 @@
-import traceback
 import json
-import time
+import traceback
 
-from PyQt5.QtWidgets import (
-    QApplication,
-    QWidget,
-    QDesktopWidget,
-    QAction,
-    QMainWindow,
-    QFileDialog,
-    QMessageBox,
-    QProgressBar,
-)
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import (
     QPainter,
     QMouseEvent,
@@ -21,13 +11,14 @@ from PyQt5.QtGui import (
     QIcon,
     QPaintEvent,
 )
-from PyQt5.QtCore import Qt, QTimer, QPoint, pyqtSignal
-
-from assets import assets
-
-# 是为了引入assets文件夹中的资源文件，看似是灰色的没有用，但实际不能删掉
-# 只是为了让pyinstaller打包时能打包到exe文件中。
-# 需要进入assets文件夹后在命令行输入指令 `pyrcc5 image.rcc -o assets.py` 来更新assets.py文件
+from PyQt5.QtWidgets import (
+    QApplication,
+    QDesktopWidget,
+    QAction,
+    QMainWindow,
+    QFileDialog,
+    QMessageBox,
+)
 
 from camera import Camera
 from data_struct.number_vector import NumberVector
@@ -39,7 +30,6 @@ from file_openner import open_file
 from paint.paint_elements import (
     paint_grid,
     paint_file_rect,
-    paint_rect_in_world,
     paint_folder_rect,
     paint_details_data,
     paint_selected_rect,
@@ -50,12 +40,18 @@ from paint.painters import VisualFilePainter
 from style.styles import EntityFolderDefaultStyle
 from tools.threads import OpenFolderThread
 
+from assets import assets
+# 是为了引入assets文件夹中的资源文件，看似是灰色的没有用，但实际不能删掉
+# 只是为了让pyinstaller打包时能打包到exe文件中。
+# 需要进入assets文件夹后在命令行输入指令 `pyrcc5 image.rcc -o assets.py` 来更新assets.py文件
+
 
 class Canvas(QMainWindow):
 
     def __init__(self):
         super().__init__()
 
+        self._open_folder_thread = None
         self.init_ui()
 
         # 重要对象绑定
@@ -198,17 +194,17 @@ class Canvas(QMainWindow):
     @staticmethod
     def on_help():
         # 创建一个消息框
-        msgBox = QMessageBox()
-        msgBox.setWindowIcon(QIcon(":/favicon.ico"))
-        msgBox.setIcon(QMessageBox.Information)
-        msgBox.setWindowTitle("visual-file 帮助说明")
-        msgBox.setText(
+        msg_box = QMessageBox()
+        msg_box.setWindowIcon(QIcon("assets/favicon.ico"))
+        msg_box.setIcon(QMessageBox.Information)
+        msg_box.setWindowTitle("visual-file 帮助说明")
+        msg_box.setText(
             "点击某矩形拖拽\n双击矩形：打开对应文件\n鼠标中键或者WSAD：移动视野\n鼠标滚轮：缩放视野\n"
         )
-        msgBox.setStandardButtons(QMessageBox.Ok)
+        msg_box.setStandardButtons(QMessageBox.Ok)
 
         # 显示消息框
-        msgBox.exec_()
+        msg_box.exec_()
 
     def on_open_folder_finish_slot(self):
         self._is_open_folder = False
@@ -339,7 +335,9 @@ class Canvas(QMainWindow):
                 self.file_observer.root_folder, self.file_observer.folder_max_deep_index
             )
             painter.setTransform(self.camera.get_world2view_transform())
-            folder_style.paint_objects(PaintContext(VisualFilePainter(painter), self.camera))
+            folder_style.paint_objects(
+                PaintContext(VisualFilePainter(painter), self.camera)
+            )
             painter.resetTransform()
         # 绘制选中的区域
         if self.file_observer.dragging_entity:
@@ -512,6 +510,7 @@ def main():
         sys.excepthook = sys.__excepthook__
 
         app = QApplication(sys.argv)
+        app.setWindowIcon(QIcon("./assets/visual-file.icns"))
 
         canvas = Canvas()
         canvas.show()

@@ -1,7 +1,6 @@
-from PyQt5.QtGui import QPainter, QColor, QPen, QFont, QFontMetrics, QTransform
 from PyQt5.QtCore import QRectF, QPointF
+from PyQt5.QtGui import QPainter
 
-from data_struct.number_vector import NumberVector
 from data_struct.rectangle import Rectangle
 from data_struct.text import Text
 
@@ -23,8 +22,9 @@ class VisualFilePainter:
                 rect.height,
             )
         )
-    
+
     def paint_text(self, text: Text):
         ascent = self._painter.fontMetrics().ascent()
-        self._painter.drawText(QPointF(text.left_top.x, text.left_top.y + ascent), text.text)
-    
+        self._painter.drawText(
+            QPointF(text.left_top.x, text.left_top.y + ascent), text.text
+        )

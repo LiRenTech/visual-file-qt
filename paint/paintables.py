@@ -22,8 +22,7 @@ class Paintable(metaclass=ABCMeta):
 
     @abstractmethod
     def get_components(self) -> List["Paintable"]:
-        """获取该对象的基本图元，如没有，返回空列表
-        """
+        """获取该对象的基本图元，如没有，返回空列表"""
         pass
 
     @abstractmethod

@@ -1,8 +1,9 @@
-from data_struct.number_vector import NumberVector
 import traceback
 
-from data_struct.rectangle import Rectangle
 from PyQt5.QtGui import QTransform
+
+from data_struct.number_vector import NumberVector
+from data_struct.rectangle import Rectangle
 
 
 class Camera:
@@ -14,6 +15,10 @@ class Camera:
     frictionExponent = 1.5
 
     scaleExponent = 1.1  # 缩放指数，越大缩放速度越快
+
+    SCALE_MAX = 150
+    SCALE_MIN = 0.001
+
     """
     空气摩擦力速度指数
     指数=2，表示 f = -k * v^2
@@ -25,7 +30,7 @@ class Camera:
         # 相机位置，（世界位置）
         self.location = location
 
-        # 最终的渲染框大小，这两个是在屏幕上的渲染宽度
+        # 最终地渲染框大小，这两个是在屏幕上的渲染宽度
         self.view_width = view_width
         self.view_height = view_height
 
@@ -64,18 +69,18 @@ class Camera:
         self.view_width = view_width
         self.view_height = view_height
 
-    def press_move(self, moveVector: NumberVector):
+    def press_move(self, move_vector: NumberVector):
         """
 
-        :param moveVector: 四个方向的 上下左右 单位向量
+        :param move_vector: 四个方向的 上下左右 单位向量
         :return:
         """
-        self.accelerateCommander += moveVector
+        self.accelerateCommander += move_vector
         self.accelerateCommander = self.accelerateCommander.limit_x(-1, 1)
         self.accelerateCommander = self.accelerateCommander.limit_y(-1, 1)
 
-    def release_move(self, moveVector: NumberVector):
-        self.accelerateCommander -= moveVector
+    def release_move(self, move_vector: NumberVector):
+        self.accelerateCommander -= move_vector
         self.accelerateCommander = self.accelerateCommander.limit_x(-1, 1)
         self.accelerateCommander = self.accelerateCommander.limit_y(-1, 1)
 
@@ -114,14 +119,13 @@ class Camera:
                 self.current_scale += (self.target_scale - self.current_scale) / 10
 
             # 彩蛋，《微观尽头》——刘慈欣
-            SCALE_MAX = 150
-            SCALE_MIN = 0.001
-            if self.current_scale > SCALE_MAX:
-                self.current_scale = SCALE_MIN * 2
-                self.target_scale = SCALE_MIN * 2
-            elif self.current_scale < SCALE_MIN:
-                self.current_scale = SCALE_MAX - 1
-                self.target_scale = SCALE_MAX - 1
+
+            if self.current_scale > self.SCALE_MAX:
+                self.current_scale = self.SCALE_MIN * 2
+                self.target_scale = self.SCALE_MIN * 2
+            elif self.current_scale < self.SCALE_MIN:
+                self.current_scale = self.SCALE_MAX - 1
+                self.target_scale = self.SCALE_MAX - 1
         except Exception as e:
             traceback.print_exc()
             print(e)
