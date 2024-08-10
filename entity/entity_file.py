@@ -45,10 +45,13 @@ class EntityFile(Entity):
         pass
 
     def move(self, d_location: NumberVector):
+        """
+        文件夹移动
+        """
         super().move(d_location)
         if not self.parent:
             return
-        # 推移其他同层的矩形框
+        # 推移其他同层的兄弟矩形框
         brother_entities: list[Entity] = self.parent.children
 
         # d_location 经过测试发现不是0
@@ -62,11 +65,38 @@ class EntityFile(Entity):
                 # 这段距离向量的模长刚好就是d_location的模长
                 self_center_location = self.body_shape.center
                 entity_center_location = entity.body_shape.center
-                # 碰撞方向单位向量
-                d_distance = (entity_center_location - self_center_location).normalize()
-                d_distance *= d_location.magnitude()
-                # 弹开距离
-                entity.move(d_distance)
+                # # 碰撞方向单位向量
+                # d_distance = (entity_center_location - self_center_location).normalize()
+                # d_distance *= d_location.magnitude()
+                # # 弹开距离
+                # entity.move(d_distance)
+
+                # 不应该给一个弹开距离，而是应该让它放在及其贴近自己的边缘的位置上。
+                d_distance = entity_center_location - self_center_location
+
+                if abs(d_distance.x) > abs(d_distance.y):
+                    # 横向移动
+                    if d_distance.x > 0:
+                        # 右移
+                        # 让该矩形几乎贴住自己的右侧边缘
+                        d_x = self.body_shape.right() - entity.body_shape.left() + 1
+                    else:
+                        # 左移
+                        # 让该矩形几乎贴住自己的左侧边缘
+                        d_x = self.body_shape.left() - entity.body_shape.right() - 1
+                    entity.move(NumberVector(d_x, 0))
+                else:
+                    # 纵向移动
+                    if d_distance.y > 0:
+                        # 下移
+                        # 让该矩形几乎贴住自己的下侧边缘
+                        d_y = self.body_shape.bottom() - entity.body_shape.top() + 1
+                    else:
+                        # 上移
+                        # 让该矩形几乎贴住自己的上侧边缘
+                        d_y = self.body_shape.top() - entity.body_shape.bottom() - 1
+                    entity.move(NumberVector(0, d_y))
+                pass
 
         # 还要让父文件夹收缩调整
         self.parent.adjust()
