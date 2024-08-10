@@ -98,9 +98,9 @@ class EntityFolder(Entity):
         pass
 
     def move(self, d_location: NumberVector):
-        # 不仅，要让文件夹本身移动
+        # 不仅，要让文件夹这个框框本身移动
         super().move(d_location)
-        # 还要，移动文件夹内所有实体
+        # 还要，移动文件夹内所有实体也移动
         for child in self.children:
             # 移动自己内部所有实体的时候，也不能用move函数本身，会炸开花。
             # child.move(d_location)
@@ -120,7 +120,7 @@ class EntityFolder(Entity):
                 continue
 
             if self.body_shape.is_collision(entity.body_shape):
-                self.collide_with(entity)
+                self.collide_with(entity)  # FIXME: 这里无穷递归了
 
     def move_to(self, location_left_top: NumberVector):
         """
