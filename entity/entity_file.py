@@ -21,7 +21,7 @@ class EntityFile(Entity):
     """
 
     def __init__(
-        self, location_left_top: NumberVector, full_path: str, parent: "EntityFolder"
+        self, location_left_top: NumberVector, full_path: str, parent: "EntityFolder" # type: ignore
     ):
         """
         左上角的位置

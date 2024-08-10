@@ -292,6 +292,11 @@ class EntityFolder(Entity):
         # 猛一想以为最多只有两个边会发生变化，但实际上由于推移多个元素的效果，可能会导致发生很复杂的变化
         # 所以每个边都要检测
         # TODO:
+        for brother_entity in self.parent.children:
+            if brother_entity == self:
+                continue
+            if self.body_shape.is_collision(brother_entity.body_shape):
+                self.collide_with(brother_entity)
 
         # 向上调用
         self.parent.adjust() if self.parent else None
