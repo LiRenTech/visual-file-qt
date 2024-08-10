@@ -124,7 +124,7 @@ class PainterUtils:
         """
         # 创建QFont对象并设置字体大小
         try:
-            font = QFont("Consolas")
+            font = QFont("maple mono")
             font.setPointSizeF(font_size)
             # 获取字体度量信息
             font_metrics = QFontMetrics(font)
@@ -179,7 +179,7 @@ class PainterUtils:
         :return: None
         """
         try:
-            font = QFont("Consolas")
+            font = QFont("maple mono")
             font.setPointSize(int(font_size))
             font_metrics = QFontMetrics(font)
 

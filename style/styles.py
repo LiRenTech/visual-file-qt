@@ -41,7 +41,7 @@ class EntityFolderDefaultStyle(Styleable):
             color_rate = folder.deep_level / self.folder_max_deep_index
             q.setPen(QPen(get_color_by_level(color_rate), 1 / context.camera.current_scale))
             if q.font().pointSize != 16:
-                q.setFont(QFont("Consolas", 16))
+                q.setFont(QFont("maple mono", 16))
             folder.paint(context)
         else:
             return
@@ -54,14 +54,14 @@ class EntityFolderDefaultStyle(Styleable):
                     color_rate = child.deep_level / self.folder_max_deep_index
                     q.setPen(QPen(get_color_by_level(color_rate), 1 / context.camera.current_scale))
                     if q.font().pointSize != 14:
-                        q.setFont(QFont("Consolas", 14))
+                        q.setFont(QFont("maple mono", 14))
                     child.paint(context)
 
     def paint_objects(self, context: PaintContext) -> None:
         q = context.painter.q_painter()
         q.setBrush(QColor(255, 255, 255, 0))
         q.setRenderHint(QPainter.Antialiasing)
-        q.setFont(QFont("Consolas", 16))
+        q.setFont(QFont("maple mono", 16))
         self._paint_folder_dfs(context, self.root_folder)
         q.setPen(QColor(0, 0, 0, 0))
         q.setBrush(QColor(0, 0, 0, 0))
