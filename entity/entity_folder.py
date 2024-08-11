@@ -17,6 +17,7 @@ from tools.string_tools import get_width_by_file_name
 
 # 提高递归深度限制
 import sys
+
 sys.setrecursionlimit(10_0000)
 
 
@@ -304,7 +305,7 @@ class EntityFolder(Entity):
         self.body_shape.height = bottom_bound - top_bound + self.PADDING * 2
         if not self.parent:
             return
-        
+
         if is_generating:
             # 这里是生成阶段，不用再向上调整了
             return

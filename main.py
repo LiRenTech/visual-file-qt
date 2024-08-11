@@ -1,7 +1,7 @@
 import json
 import traceback
 
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import Qt, QTimer, QUrl
 from PyQt5.QtGui import (
     QPainter,
     QMouseEvent,
@@ -10,6 +10,7 @@ from PyQt5.QtGui import (
     QColor,
     QIcon,
     QPaintEvent,
+    QDesktopServices,
 )
 from PyQt5.QtWidgets import (
     QApplication,
@@ -18,6 +19,7 @@ from PyQt5.QtWidgets import (
     QMainWindow,
     QFileDialog,
     QMessageBox,
+    QPushButton,
 )
 
 from camera import Camera
@@ -41,6 +43,7 @@ from style.styles import EntityFolderDefaultStyle
 from tools.threads import OpenFolderThread
 
 from assets import assets
+
 # 是为了引入assets文件夹中的资源文件，看似是灰色的没有用，但实际不能删掉
 # 只是为了让pyinstaller打包时能打包到exe文件中。
 # 需要进入assets文件夹后在命令行输入指令 `pyrcc5 image.rcc -o assets.py` 来更新assets.py文件
@@ -199,12 +202,37 @@ class Canvas(QMainWindow):
         msg_box.setIcon(QMessageBox.Information)
         msg_box.setWindowTitle("visual-file 帮助说明")
         msg_box.setText(
-            "点击某矩形拖拽\n双击矩形：打开对应文件\n鼠标中键或者WASD：移动视野\n鼠标滚轮：缩放视野\n"
+            "\n\n".join(
+                [
+                    "摆放位置：点击某矩形左键拖拽",
+                    "打开文件：左键双击某矩形，以系统默认方式打开对应文件或文件夹",
+                    "移动视野：鼠标中键拖拽 或 右键拖拽 或 WASD键",
+                    "缩放视野：鼠标滚轮",
+                    "重置视野：双击鼠标中键",
+                    "反馈问题：如有问题建议在github上提交issues，或在b站视频下方评论区留言。",
+                ]
+            )
         )
+        # github按钮
+        button_github = QPushButton("Github 项目地址")
+        msg_box.addButton(button_github, QMessageBox.ActionRole)
+        button_github.clicked.connect(Canvas.__open_github)
         msg_box.setStandardButtons(QMessageBox.Ok)
+        # b站按钮
+        button_bilibili = QPushButton("bilibili 视频介绍")
+        msg_box.addButton(button_bilibili, QMessageBox.ActionRole)
+        button_bilibili.clicked.connect(Canvas.__open_bilibili)
 
         # 显示消息框
         msg_box.exec_()
+
+    @staticmethod
+    def __open_github():
+        QDesktopServices.openUrl(QUrl("https://github.com/LiRenTech/visual-file-qt"))
+
+    @staticmethod
+    def __open_bilibili():
+        QDesktopServices.openUrl(QUrl("https://www.bilibili.com/video/BV1qw4m1k7LD"))
 
     def on_open_folder_finish_slot(self):
         self._is_open_folder = False
@@ -398,7 +426,10 @@ class Canvas(QMainWindow):
                 )
             else:
                 self.file_observer.dragging_entity = None
-        elif a0.button() == Qt.MouseButton.MiddleButton or a0.button() == Qt.MouseButton.RightButton:
+        elif (
+            a0.button() == Qt.MouseButton.MiddleButton
+            or a0.button() == Qt.MouseButton.RightButton
+        ):
             # 开始准备移动，记录好上一次鼠标位置的相差距离向量
             self._last_mouse_move_location = self.camera.location_view2world(
                 NumberVector(a0.pos().x(), a0.pos().y())
@@ -433,7 +464,10 @@ class Canvas(QMainWindow):
                 print(e)
                 traceback.print_exc()
                 pass
-        if a0.buttons() == Qt.MouseButton.MiddleButton or a0.buttons() == Qt.MouseButton.RightButton:
+        if (
+            a0.buttons() == Qt.MouseButton.MiddleButton
+            or a0.buttons() == Qt.MouseButton.RightButton
+        ):
             # 移动的时候，应该记录与上一次鼠标位置的相差距离向量
             current_mouse_move_location = self.camera.location_view2world(
                 NumberVector(a0.pos().x(), a0.pos().y())
@@ -443,7 +477,10 @@ class Canvas(QMainWindow):
 
     def mouseReleaseEvent(self, a0: QMouseEvent | None):
         assert a0 is not None
-        if a0.button() == Qt.MouseButton.MiddleButton or a0.button() == Qt.MouseButton.RightButton:
+        if (
+            a0.button() == Qt.MouseButton.MiddleButton
+            or a0.button() == Qt.MouseButton.RightButton
+        ):
             if self.file_observer.is_drag_locked:
                 return
             point_view_location = NumberVector(a0.pos().x(), a0.pos().y())

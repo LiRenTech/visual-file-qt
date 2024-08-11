@@ -44,7 +44,11 @@ class Entity(Paintable, metaclass=ABCMeta):
             # x < 0  , x == 0 , x > 0
             [self._move_left_up, self._move_up, self._move_right_up],  # y < 0
             [self._move_left, self._move_down, self._move_right],  # y == 0
-            [self._move_left_down,self._move_down,self._move_right_down,],  # y > 0
+            [
+                self._move_left_down,
+                self._move_down,
+                self._move_right_down,
+            ],  # y > 0
         ]
 
         def number_to_index(x):
@@ -79,7 +83,7 @@ class Entity(Paintable, metaclass=ABCMeta):
     def _move_down(self, other: "Entity"):
         d_y = self.body_shape.bottom() - other.body_shape.top() - 1
         other.move(NumberVector(0, d_y))
-    
+
     # 上面四种非常难做到，因为人手动拖拽很难完全对准，并且又是float类型
     # 所以基本上是矩形的斜向挤压问题
     # 这个时候就要看矩形产生挤压时的重叠部分的 子矩形形状 ，是宽大于高还是高大于宽

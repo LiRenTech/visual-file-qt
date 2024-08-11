@@ -173,7 +173,7 @@ def sort_rectangle_many_files_less_folders(
     folders = sort_rectangle_all_files(folders, margin)
     # 找到文件夹列表中最靠左下角的那个文件夹矩形的左下角坐标
     min_x = min(folders, key=lambda r: r.location_left_top.x).location_left_top.x
-    
+
     max_bottom_folder = max(folders, key=lambda r: r.bottom())
 
     max_y = max_bottom_folder.bottom() + margin
@@ -183,6 +183,7 @@ def sort_rectangle_many_files_less_folders(
     # 看似没排，其实是排好了
     return rectangles
     pass
+
 
 def sort_rectangle_all_files(
     rectangles: List[Rectangle], margin: float
