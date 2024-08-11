@@ -15,6 +15,10 @@ from tools.rectangle_packing import (
 )
 from tools.string_tools import get_width_by_file_name
 
+# 提高递归深度限制
+import sys
+sys.setrecursionlimit(10_0000)
+
 
 class EntityFolder(Entity):
     """
@@ -99,22 +103,19 @@ class EntityFolder(Entity):
         pass
 
     def move(self, d_location: NumberVector):
-        # 不仅，要让文件夹本身移动
+        # 不仅，要让文件夹这个框框本身移动
         super().move(d_location)
-        # 还要，移动文件夹内所有实体
+        # 还要，移动文件夹内所有实体也移动
         for child in self.children:
             # 移动自己内部所有实体的时候，也不能用move函数本身，会炸开花。
             # child.move(d_location)
             child.move_to(child.body_shape.location_left_top + d_location)
 
-        # 推移其他同层的矩形框 TODO: 此处有点重复代码
+        # 推移其他同层的矩形框
         if not self.parent:
             return
-
         # 让父文件夹收缩调整
         self.parent.adjust()
-
-        # ==== 开始同层碰撞检测
 
         brother_entities: list[EntityFile | EntityFolder] = self.parent.children
 
@@ -123,16 +124,7 @@ class EntityFolder(Entity):
                 continue
 
             if self.body_shape.is_collision(entity.body_shape):
-                # 如果发生了碰撞，则计算两个矩形的几何中心，被撞的矩形按照几何中心连线弹开一段距离
-                # 这段距离向量的模长刚好就是d_location的模长
-                self_center_location = self.body_shape.center
-                entity_center_location = entity.body_shape.center
-                # 碰撞方向单位向量
-                d_distance = (entity_center_location - self_center_location).normalize()
-                d_distance *= d_location.magnitude()
-                # 弹开距离
-                # entity.move(d_distance)  # 这一弹，是造成碰撞、其他物体位置连续炸开花的罪魁祸首。
-                entity.move_to(entity.body_shape.location_left_top + d_distance)
+                self.collide_with(entity)
 
     def move_to(self, location_left_top: NumberVector):
         """
@@ -265,10 +257,14 @@ class EntityFolder(Entity):
             pass
         pass
 
-    def adjust(self):
+    def adjust(self, is_generating=False):
         """
         调整文件夹框框的宽度和长度，扩大或缩进，使得将子一层文件都直观上包含进来
-        该调整过程是相对于文件树形结构 自底向上的
+        该调整过程是相对于文件树形结构 自底向上的递归
+
+        is_generating: 是否是最初的布局生成阶段
+        在最开始初始化摆放结构的时候，只要保证好自身内部结构完好就可以了
+        不要考虑自己文件夹形状膨胀之后对兄弟节点的碰撞，这可能会造成莫名奇妙的无穷递归bug。
         :return:
         """
         if not self.children:
@@ -292,6 +288,15 @@ class EntityFolder(Entity):
                 child.body_shape.location_left_top.y + child.body_shape.height,
             )
 
+        if (
+            self.body_shape.left() == left_bound
+            and self.body_shape.right() == right_bound
+            and self.body_shape.top() == top_bound
+            and self.body_shape.bottom() == bottom_bound
+        ):
+            # 如果没有变化，就不用调整了
+            return
+
         self.body_shape.location_left_top = NumberVector(
             left_bound - self.PADDING, top_bound - self.PADDING
         )
@@ -299,14 +304,22 @@ class EntityFolder(Entity):
         self.body_shape.height = bottom_bound - top_bound + self.PADDING * 2
         if not self.parent:
             return
+        
+        if is_generating:
+            # 这里是生成阶段，不用再向上调整了
+            return
 
-        # 扩张的边可能会导致兄弟元素发生变化
-        # 猛一想以为最多只有两个边会发生变化，但实际上由于推移多个元素的效果，可能会导致发生很复杂的变化
-        # 所以每个边都要检测
-        # TODO:
+        # 收缩扩张是否导致碰撞了，检查所有兄弟节点是否有碰撞
+        for brother_entity in self.parent.children:
+            if brother_entity == self:
+                continue
+            if self.body_shape.is_collision(brother_entity.body_shape):
+                self.collide_with(brother_entity)
 
-        # 向上调用
-        self.parent.adjust() if self.parent else None
+        # 扩张收缩是否导致了父层的变化，向上调用
+        # 但如果自己本身没有发生变化，就不用再向上调用了，拦截冒泡效应
+        if self.parent is not None:
+            self.parent.adjust()
         pass
 
     def adjust_tree_location(self):
@@ -368,7 +381,7 @@ class EntityFolder(Entity):
                 + self.body_shape.location_left_top
             )
 
-        folder.adjust()
+        folder.adjust(is_generating=True)
         pass
 
     def __repr__(self):

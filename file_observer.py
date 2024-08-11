@@ -38,8 +38,10 @@ class FileObserver:
         self.folder_full_path = new_path
         self.root_folder = EntityFolder(NumberVector(0, 0), self.folder_full_path)
         # 时间花费较少
+        print("读取文件夹内容中")
         self.root_folder.update_tree_content()
-        # 时间花费较大，如果调整算法是O(n^2)，遇到文件夹里有上百个小文件会极慢
+        print("生成排列结构中")
+        # 时间花费较大
         self.root_folder.adjust_tree_location()
 
         self.dragging_entity = None
@@ -49,7 +51,7 @@ class FileObserver:
             self.root_folder.body_shape.height / 2,
         )
         self.root_folder.move_to(target_location_left_top)
-
+        print("计算最大深度中")
         self.folder_max_deep_index = self.root_folder.count_deep_level()
 
     def output_layout_dict(self) -> dict:
@@ -121,7 +123,6 @@ class FileObserver:
         entity_folders.sort(key=lambda x: x.full_path.count("/"), reverse=True)
         for entity_folder in entity_folders:
             if location_world in entity_folder.body_shape:
-                # print(entity_folder.full_path, "点击到了文件夹")
                 return entity_folder
         # 未击中任何实体
         return None
