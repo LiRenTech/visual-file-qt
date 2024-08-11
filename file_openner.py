@@ -3,7 +3,6 @@
 """
 
 import os
-import subprocess
 
 
 def open_file(full_path_file: str):

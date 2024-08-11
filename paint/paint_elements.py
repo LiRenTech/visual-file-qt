@@ -1,4 +1,3 @@
-from functools import lru_cache
 from PyQt5.QtGui import QPainter, QColor
 
 from camera import Camera
@@ -8,7 +7,7 @@ from entity.entity import Entity
 from entity.entity_file import EntityFile
 from entity.entity_folder import EntityFolder
 from paint.paint_utils import PainterUtils
-from tools.color_utils import get_color_by_level, mix_colors
+from tools.color_utils import get_color_by_level
 
 
 def paint_grid(paint: QPainter, camera: Camera):
@@ -157,6 +156,7 @@ def paint_folder_rect(
     :param paint:
     :param camera:
     :param entity_file:
+    :param color_rate:
     :return:
     """
     # 先画一个框
