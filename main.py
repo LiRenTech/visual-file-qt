@@ -203,7 +203,7 @@ class Canvas(QMainWindow):
         msgBox.setIcon(QMessageBox.Information)
         msgBox.setWindowTitle("visual-file 帮助说明")
         msgBox.setText(
-            "点击某矩形拖拽\n双击矩形：打开对应文件\n鼠标中键或者WSAD：移动视野\n鼠标滚轮：缩放视野\n"
+            "点击某矩形拖拽\n双击矩形：打开对应文件\n鼠标中键或者WASD：移动视野\n鼠标滚轮：缩放视野\n"
         )
         msgBox.setStandardButtons(QMessageBox.Ok)
 
@@ -400,7 +400,7 @@ class Canvas(QMainWindow):
                 )
             else:
                 self.file_observer.dragging_entity = None
-        elif a0.button() == Qt.MouseButton.MiddleButton:
+        elif a0.button() == Qt.MouseButton.MiddleButton or a0.button() == Qt.MouseButton.RightButton:
             # 开始准备移动，记录好上一次鼠标位置的相差距离向量
             self._last_mouse_move_location = self.camera.location_view2world(
                 NumberVector(a0.pos().x(), a0.pos().y())
@@ -435,7 +435,7 @@ class Canvas(QMainWindow):
                 print(e)
                 traceback.print_exc()
                 pass
-        if a0.buttons() == Qt.MouseButton.MiddleButton:
+        if a0.buttons() == Qt.MouseButton.MiddleButton or a0.buttons() == Qt.MouseButton.RightButton:
             # 移动的时候，应该记录与上一次鼠标位置的相差距离向量
             current_mouse_move_location = self.camera.location_view2world(
                 NumberVector(a0.pos().x(), a0.pos().y())
@@ -445,7 +445,7 @@ class Canvas(QMainWindow):
 
     def mouseReleaseEvent(self, a0: QMouseEvent | None):
         assert a0 is not None
-        if a0.button() == Qt.MouseButton.MiddleButton:
+        if a0.button() == Qt.MouseButton.MiddleButton or a0.button() == Qt.MouseButton.RightButton:
             if self.file_observer.is_drag_locked:
                 return
             point_view_location = NumberVector(a0.pos().x(), a0.pos().y())
@@ -465,8 +465,9 @@ class Canvas(QMainWindow):
             entity = self.file_observer.get_entity_by_location(point_world_location)
             if entity:
                 open_file(entity.full_path)
-
-        pass
+        elif a0.button() == Qt.MouseButton.MiddleButton:
+            # 双击中键返回原位
+            self.camera.reset()
 
     def wheelEvent(self, a0: QWheelEvent | None):
         assert a0 is not None
