@@ -1,4 +1,4 @@
-from abc import ABC, ABCMeta, abstractmethod
+from abc import ABCMeta
 from typing import Callable
 
 from data_struct.number_vector import NumberVector
@@ -12,8 +12,8 @@ class Entity(Paintable, metaclass=ABCMeta):
     场景里参与碰撞检测的都算实体
     """
 
-    def __init__(self, bodyShape: Rectangle):
-        self.body_shape = bodyShape
+    def __init__(self, body_shape: Rectangle):
+        self.body_shape = body_shape
 
     def move(self, d_location: NumberVector):
         """

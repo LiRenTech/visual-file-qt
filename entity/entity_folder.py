@@ -1,18 +1,19 @@
+from typing import List, Optional, Any
+
 from data_struct.number_vector import NumberVector
 from data_struct.rectangle import Rectangle
 from data_struct.text import Text
 from entity.entity import Entity
 from entity.entity_file import EntityFile
+from exclude_manager import EXCLUDE_MANAGER
 from paint.paintables import PaintContext, Paintable
 from tools.gitignore_parser import parse_gitignore
-from tools.string_tools import get_width_by_file_name
-from typing import List, Optional, Any
 from tools.rectangle_packing import (
     sort_rectangle_all_files,
     sort_rectangle_greedy,
     sort_rectangle_many_files_less_folders,
 )
-from exclude_manager import EXCLUDE_MANAGER
+from tools.string_tools import get_width_by_file_name
 
 # 提高递归深度限制
 import sys

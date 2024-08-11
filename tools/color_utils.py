@@ -1,4 +1,5 @@
 from functools import lru_cache
+
 from PyQt5.QtGui import QColor
 
 
@@ -13,11 +14,12 @@ def mix_colors(color1, color2, rate) -> QColor:
     b = (1 - rate) * b1 + rate * b2
     return QColor(int(r), int(g), int(b))
 
+
 @lru_cache(maxsize=1000)
-def get_color_by_level(rate: int) -> QColor:
+def get_color_by_level(rate: float) -> QColor:
     """
     根据等级获取颜色
-    :param level:
+    :param rate:
     :return:
     """
     return mix_colors((35, 170, 242), (76, 236, 45), rate)
