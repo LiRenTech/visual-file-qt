@@ -62,7 +62,6 @@ class EntityFile(Entity):
 
             if self.body_shape.is_collision(entity.body_shape):
                 self.collide_with(entity)
-
         # 还要让父文件夹收缩调整
         self.parent.adjust()
 

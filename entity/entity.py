@@ -32,11 +32,10 @@ class Entity(Paintable, metaclass=ABCMeta):
         self.body_shape.location_left_top = location
 
     def collide_with(self, other: "Entity"):
-        # 如果发生了碰撞，则计算两个矩形的几何中心，被撞的矩形按照几何中心连线弹开一段距离
-        # 这段距离向量的模长刚好就是d_location的模长
+        # 如果发生了碰撞，则计算两个矩形的几何中心，被撞的矩形按照几何中心连线，根据这个连线继续判断
         self_center_location = self.body_shape.center
         entity_center_location = other.body_shape.center
-        # 不应该给一个弹开距离，而是应该让它放在及其贴近自己的边缘的位置上。
+        # 让它放在及其贴近自己的边缘的位置上。
 
         # self_center_location -> entity_center_location
         d_distance = entity_center_location - self_center_location
