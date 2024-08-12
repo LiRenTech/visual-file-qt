@@ -52,6 +52,11 @@ class Rectangle:
     def bottom(self):
         return self.location_left_top.y + self.height
 
+    @staticmethod
+    def from_edges(left: float, top: float, right: float, bottom: float) -> "Rectangle":
+        """通过四条边来创建矩形"""
+        return Rectangle(NumberVector(left, top), right - left, bottom - top)
+
     def get_fore_points(self) -> list[NumberVector]:
         return [
             NumberVector(self.location_left_top.x, self.location_left_top.y),

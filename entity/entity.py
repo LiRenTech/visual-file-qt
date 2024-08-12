@@ -15,6 +15,9 @@ class Entity(Paintable, metaclass=ABCMeta):
     def __init__(self, body_shape: Rectangle):
         self.body_shape = body_shape
 
+        # 拖拽点相对于原点的偏移，从左上角点指向拖拽点
+        self.dragging_offset: NumberVector = NumberVector(0, 0)
+
     def move(self, d_location: NumberVector):
         """
         移动实体

@@ -24,16 +24,19 @@ from PyQt5.QtWidgets import (
 
 from camera import Camera
 from data_struct.number_vector import NumberVector
+from data_struct.rectangle import Rectangle
+from entity.entity import Entity
 from entity.entity_file import EntityFile
 from entity.entity_folder import EntityFolder
 from exclude_dialog import ExcludeDialog
-from file_observer import FileObserver
+from file_observer import FileObserver, InteractiveState
 from file_openner import open_file
 from paint.paint_elements import (
     paint_grid,
     paint_file_rect,
     paint_folder_rect,
     paint_details_data,
+    paint_rect_in_world,
     paint_selected_rect,
     paint_alert_message,
 )
@@ -362,7 +365,7 @@ class Canvas(QMainWindow):
                 PaintContext(VisualFilePainter(painter), self.camera)
             )
             painter.resetTransform()
-        # 绘制选中的区域
+        # 绘制选中的矩形的填充色
         for entity in self.file_observer.dragging_entity_list:
             paint_selected_rect(
                 painter,
@@ -370,6 +373,35 @@ class Canvas(QMainWindow):
                 entity,
                 self.file_observer.dragging_entity_activating,
             )
+        # 绘制框选的矩形
+        if self.file_observer.select_rect_start_location is not None:
+            folder = self.file_observer.get_folder_by_location(
+                self.file_observer.select_rect_start_location
+            )
+            user_rect = self.file_observer.select_rectangle
+
+            if folder and user_rect:
+                # 绘制框选的矩形 与 文件夹取交集
+                paint_rect_in_world(
+                    painter,
+                    self.camera,
+                    Rectangle.from_edges(
+                        max(user_rect.left(), folder.body_shape.left()),
+                        max(user_rect.top(), folder.body_shape.top()),
+                        min(user_rect.right(), folder.body_shape.right()),
+                        min(user_rect.bottom(), folder.body_shape.bottom()),
+                    ),
+                    QColor(255, 255, 0, 128),
+                    QColor(255, 255, 0, 255),
+                )
+                # 绘制文件夹外框
+                paint_rect_in_world(
+                    painter,
+                    self.camera,
+                    folder.body_shape,
+                    QColor(0, 0, 0, 0),
+                    QColor(255, 255, 0, 255),
+                )
         # 绘制细节信息
         paint_details_data(
             painter,
@@ -377,6 +409,7 @@ class Canvas(QMainWindow):
             [
                 f"{self.file_observer.root_folder.full_path if self.file_observer.root_folder else 'no root folder'}",
                 f"drag locked: {self.file_observer.is_drag_locked}",
+                f"drag state: {self.file_observer.interactive_state.name}",
             ],
         )
 
@@ -406,21 +439,37 @@ class Canvas(QMainWindow):
                         child,
                         child.deep_level / self.file_observer.folder_max_deep_index,
                     )
-        pass
 
     def mousePressEvent(self, a0: QMouseEvent | None):
         assert a0 is not None
+        point_view_location = NumberVector(a0.pos().x(), a0.pos().y())
+        point_world_location = self.camera.location_view2world(point_view_location)
+
         if a0.button() == Qt.MouseButton.LeftButton:
-            point_view_location = NumberVector(a0.pos().x(), a0.pos().y())
-            point_world_location = self.camera.location_view2world(point_view_location)
-            entity = self.file_observer.get_entity_by_location(point_world_location)
-            if entity:
-                self.file_observer.dragging_entity_list = [entity]
-                self.file_observer.dragging_offset = (
-                    point_world_location - entity.body_shape.location_left_top
-                )
+            # 如果当前正按下的位置正好命中了正在选择的任意一个矩形，则开始拖拽
+            for entity in self.file_observer.dragging_entity_list:
+                if entity.body_shape.is_contain_point(point_world_location):
+                    self.file_observer.interactive_state = InteractiveState.DRAG
+                    break
             else:
+                # 否则，开始框选
+                self.file_observer.interactive_state = InteractiveState.SELECT
+
+            # 状态更新完毕
+
+            if self.file_observer.interactive_state == InteractiveState.SELECT:
+                # 清空上一次选择的内容
                 self.file_observer.dragging_entity_list = []
+                # 更新选择框起始位置
+                self.file_observer.select_rect_start_location = (
+                    point_world_location.clone()
+                )
+            elif self.file_observer.interactive_state == InteractiveState.DRAG:
+                # 开始拖拽，更新每个被拖拽实体的 dragging_offset
+                for entity in self.file_observer.dragging_entity_list:
+                    entity.dragging_offset = (
+                        point_world_location - entity.body_shape.location_left_top
+                    )
         elif (
             a0.button() == Qt.MouseButton.MiddleButton
             or a0.button() == Qt.MouseButton.RightButton
@@ -431,31 +480,61 @@ class Canvas(QMainWindow):
             )
             pass
 
+    def _select_rect_get_entity_list(self, select_rect: Rectangle) -> list[Entity]:
+        """
+        选择current_folder中的实体
+        选择框的起始点位置落在了什么文件夹里就直接决定它只能选中哪一个文件夹里的内容
+        """
+        entity_list = []
+
+        if self.file_observer.select_rect_start_location is None:
+            return entity_list
+
+        folder = self.file_observer.get_folder_by_location(
+            self.file_observer.select_rect_start_location
+        )
+        if folder:
+            for child in folder.children:
+                if child.body_shape.is_collision(select_rect):
+                    entity_list.append(child)
+
+        return entity_list
+
     def mouseMoveEvent(self, a0: QMouseEvent | None):
         assert a0 is not None
+        point_view_location = NumberVector(a0.pos().x(), a0.pos().y())
+        point_world_location = self.camera.location_view2world(point_view_location)
+
         if a0.buttons() == Qt.MouseButton.LeftButton:
-            if self.file_observer.is_drag_locked:
-                return
-            # 左键拖拽，但要看看是否是激活状态
-            try:
-                point_view_location = NumberVector(a0.pos().x(), a0.pos().y())
-                point_world_location = self.camera.location_view2world(
-                    point_view_location
+            if self.file_observer.interactive_state == InteractiveState.SELECT:
+                # 更新矩形位置大小
+                self.file_observer.select_rect_end_location = (
+                    point_world_location.clone()
                 )
-                if not self.file_observer.dragging_entity_activating:
-                    # 不是一个激活的状态 就不动了
-                    return
-                for entity in self.file_observer.dragging_entity_list:
-                    # 让它跟随鼠标移动
-                    new_left_top = (
-                        point_world_location - self.file_observer.dragging_offset
+                # 检测矩形是否和其他实体发生碰撞
+                select_rect = self.file_observer.select_rectangle
+                if select_rect and self.file_observer.root_folder:
+                    self.file_observer.dragging_entity_list = (
+                        self._select_rect_get_entity_list(select_rect)
                     )
-                    d_location = new_left_top - entity.body_shape.location_left_top
-                    entity.move(d_location)
-            except Exception as e:
-                print(e)
-                traceback.print_exc()
-                pass
+                    pass
+            elif self.file_observer.interactive_state == InteractiveState.DRAG:
+                if self.file_observer.is_drag_locked:
+                    return
+                # 左键拖拽，但要看看是否是激活状态
+                try:
+                    if not self.file_observer.dragging_entity_activating:
+                        # 不是一个激活的状态 就不动了
+                        return
+                    for entity in self.file_observer.dragging_entity_list:
+                        # 让它跟随鼠标移动
+                        new_left_top = point_world_location - entity.dragging_offset
+                        d_location = new_left_top - entity.body_shape.location_left_top
+                        entity.move(d_location)
+                except Exception as e:
+                    print(e)
+                    traceback.print_exc()
+                    pass
         if (
             a0.buttons() == Qt.MouseButton.MiddleButton
             or a0.buttons() == Qt.MouseButton.RightButton
@@ -469,14 +548,36 @@ class Canvas(QMainWindow):
 
     def mouseReleaseEvent(self, a0: QMouseEvent | None):
         assert a0 is not None
+        point_view_location = NumberVector(a0.pos().x(), a0.pos().y())
+        point_world_location = self.camera.location_view2world(point_view_location)
+
+        if a0.button() == Qt.MouseButton.LeftButton:
+            if self.file_observer.interactive_state == InteractiveState.SELECT:
+                # 左键释放，结束框选视觉效果
+                self.file_observer.clear_select_rect()
+                # 如果左键释放都没有找到一个实体，则在释放位置选择住一个矩形
+                if not self.file_observer.dragging_entity_list:
+                    point_entity = self.file_observer.get_entity_by_location(
+                        point_world_location
+                    )
+                    # 但前提是这个矩形不能是超大矩形，即没有被屏幕完全覆盖住的
+                    if point_entity and self.camera.cover_world_rectangle.is_contain(
+                        point_entity.body_shape
+                    ):
+                        self.file_observer.dragging_entity_list = [point_entity]
+
+            elif self.file_observer.interactive_state == InteractiveState.DRAG:
+                if self.file_observer.is_drag_locked:
+                    return
+                self.file_observer.interactive_state = InteractiveState.SELECT
+
         if (
             a0.button() == Qt.MouseButton.MiddleButton
             or a0.button() == Qt.MouseButton.RightButton
         ):
             if self.file_observer.is_drag_locked:
                 return
-            point_view_location = NumberVector(a0.pos().x(), a0.pos().y())
-            point_world_location = self.camera.location_view2world(point_view_location)
+
             entity = self.file_observer.get_entity_by_location(point_world_location)
             if entity:
                 pass
