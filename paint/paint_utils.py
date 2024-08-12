@@ -104,6 +104,7 @@ class PainterUtils:
         painter.setBrush(fill_color)
         painter.setRenderHint(QPainter.Antialiasing)
         painter.drawRect(int(left_top.x), int(left_top.y), int(width), int(height))
+        # HACK: 这个数字转int有隐患，OverflowError: argument 3 overflowed: value must be in the range -2147483648 to 2147483647
         painter.setPen(QColor(0, 0, 0, 0))
         painter.setBrush(QColor(0, 0, 0, 0))
 

@@ -52,6 +52,9 @@ class EntityFolder(Entity):
         self.parent: Optional["EntityFolder"] = None
         self.children: "list[EntityFolder | EntityFile]" = []
 
+        # 是否隐藏内部内容，用于观看宏观的时候防止绘制太多细节而卡顿
+        self.is_hide_inner = False
+
         # 这个矩形有点麻烦，它可能应该是一个动态变化的东西，不应该变的是它的左上角位置，变得是他的大小
         self.adjust()
 

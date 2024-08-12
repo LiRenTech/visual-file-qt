@@ -356,7 +356,7 @@ class Canvas(QMainWindow):
             paint_alert_message(painter, self.camera, "请先打开文件夹")
         # 画场景物体
 
-        # 先画文件夹
+        # 画各种矩形
         if self.file_observer.root_folder:
             # self.paint_folder_dfs(painter, self.file_observer.root_folder)
             folder_style = EntityFolderDefaultStyle(
