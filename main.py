@@ -316,20 +316,15 @@ class Canvas(QMainWindow):
         self.camera.tick()
         # 重绘窗口
         self.update()
-
-        if self.file_observer.dragging_entity:
+        for entity in self.file_observer.dragging_entity_list:
             # 对比当前选中的实体矩形和视野矩形
-            if self.camera.cover_world_rectangle.is_contain(
-                self.file_observer.dragging_entity.body_shape
-            ):
+            if self.camera.cover_world_rectangle.is_contain(entity.body_shape):
                 # 套住了
                 self.file_observer.dragging_entity_activating = True
-                pass
             else:
                 # 没套住
                 self.file_observer.dragging_entity_activating = False
-                pass
-            pass
+                break
 
     def paintEvent(self, a0: QPaintEvent | None):
         assert a0 is not None
@@ -368,11 +363,11 @@ class Canvas(QMainWindow):
             )
             painter.resetTransform()
         # 绘制选中的区域
-        if self.file_observer.dragging_entity:
+        for entity in self.file_observer.dragging_entity_list:
             paint_selected_rect(
                 painter,
                 self.camera,
-                self.file_observer.dragging_entity,
+                entity,
                 self.file_observer.dragging_entity_activating,
             )
         # 绘制细节信息
@@ -420,12 +415,12 @@ class Canvas(QMainWindow):
             point_world_location = self.camera.location_view2world(point_view_location)
             entity = self.file_observer.get_entity_by_location(point_world_location)
             if entity:
-                self.file_observer.dragging_entity = entity
+                self.file_observer.dragging_entity_list = [entity]
                 self.file_observer.dragging_offset = (
                     point_world_location - entity.body_shape.location_left_top
                 )
             else:
-                self.file_observer.dragging_entity = None
+                self.file_observer.dragging_entity_list = []
         elif (
             a0.button() == Qt.MouseButton.MiddleButton
             or a0.button() == Qt.MouseButton.RightButton
@@ -447,19 +442,16 @@ class Canvas(QMainWindow):
                 point_world_location = self.camera.location_view2world(
                     point_view_location
                 )
-                if self.file_observer.dragging_entity:
-                    if not self.file_observer.dragging_entity_activating:
-                        # 不是一个激活的状态 就不动了
-                        return
+                if not self.file_observer.dragging_entity_activating:
+                    # 不是一个激活的状态 就不动了
+                    return
+                for entity in self.file_observer.dragging_entity_list:
                     # 让它跟随鼠标移动
                     new_left_top = (
                         point_world_location - self.file_observer.dragging_offset
                     )
-                    d_location = (
-                        new_left_top
-                        - self.file_observer.dragging_entity.body_shape.location_left_top
-                    )
-                    self.file_observer.dragging_entity.move(d_location)
+                    d_location = new_left_top - entity.body_shape.location_left_top
+                    entity.move(d_location)
             except Exception as e:
                 print(e)
                 traceback.print_exc()
@@ -490,7 +482,7 @@ class Canvas(QMainWindow):
                 pass
             else:
                 # 让它脱离鼠标吸附
-                self.file_observer.dragging_entity = None
+                self.file_observer.dragging_entity_list = []
 
     def mouseDoubleClickEvent(self, a0: QMouseEvent | None):
         assert a0 is not None

@@ -1,4 +1,5 @@
 from data_struct.number_vector import NumberVector
+from entity.entity import Entity
 from entity.entity_file import EntityFile
 from entity.entity_folder import EntityFolder
 
@@ -14,7 +15,7 @@ class FileObserver:
 
         self.root_folder: EntityFolder | None = None
         # 当前正在拖拽的
-        self.dragging_entity: EntityFile | EntityFolder | None = None
+        self.dragging_entity_list: list[Entity] = []
         # 拖拽点相对于原点的偏移
         self.dragging_offset: NumberVector = NumberVector(0, 0)
         # 当前选中的实体是否是激活状态
@@ -44,7 +45,7 @@ class FileObserver:
         # 时间花费较大
         self.root_folder.adjust_tree_location()
 
-        self.dragging_entity = None
+        self.dragging_entity_list = []
         # 还需要将新的文件夹移动到世界坐标的中心。
         target_location_left_top = NumberVector(0, 0) - NumberVector(
             self.root_folder.body_shape.width / 2,
@@ -72,7 +73,7 @@ class FileObserver:
         if self.root_folder is None:
             return
         self.root_folder.read_data(layout_file["layout"][0])
-        self.dragging_entity = None
+        self.dragging_entity_list = []
 
     def _entity_files(self, folder: EntityFolder) -> list[EntityFile]:
         """
