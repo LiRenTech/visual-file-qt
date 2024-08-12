@@ -72,8 +72,9 @@ class EntityFolderDefaultStyle(Styleable):
             ):
                 # 这时代表文件夹内部已经不显示了，要将文件夹名字居中显示在中央
                 q.setFont(QFont("Consolas", int(16 / context.camera.current_scale)))
-                pass
+                folder.is_hide_inner = True
             else:
+                folder.is_hide_inner = False
                 if q.font().pointSize != 16:
                     q.setFont(QFont("Consolas", 16))
             folder.paint(context)

@@ -384,9 +384,7 @@ class EntityFolder(Entity):
                 sorted_rectangle_list[i].location_left_top
                 + self.body_shape.location_left_top
             )
-
         folder.adjust(is_generating=True)
-        pass
 
     def __repr__(self):
         return f"({self.full_path})"
@@ -396,6 +394,11 @@ class EntityFolder(Entity):
 
     def paint(self, context: PaintContext) -> None:
         context.painter.paint_rect(self.body_shape)
-        context.painter.paint_text(
-            Text(self.body_shape.location_left_top, self.folder_name)
-        )
+        if self.is_hide_inner:
+            context.painter.paint_text(
+                Text(self.body_shape.center, self.folder_name)
+            )
+        else:
+            context.painter.paint_text(
+                Text(self.body_shape.location_left_top, self.folder_name)
+            )
