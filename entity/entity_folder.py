@@ -395,9 +395,7 @@ class EntityFolder(Entity):
     def paint(self, context: PaintContext) -> None:
         context.painter.paint_rect(self.body_shape)
         if self.is_hide_inner:
-            context.painter.paint_text(
-                Text(self.body_shape.center, self.folder_name)
-            )
+            context.painter.paint_text(Text(self.body_shape.center, self.folder_name))
         else:
             context.painter.paint_text(
                 Text(self.body_shape.location_left_top, self.folder_name)

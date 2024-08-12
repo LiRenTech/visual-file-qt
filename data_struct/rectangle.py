@@ -104,6 +104,13 @@ class Rectangle:
             and self.bottom() >= rect.bottom()
         )
 
+    def is_contain_point(self, point: NumberVector) -> bool:
+        """判断是否包含点"""
+        return (
+            self.left() <= point.x <= self.right()
+            and self.top() <= point.y <= self.bottom()
+        )
+
     def __repr__(self):
         return f"Rectangle({self.location_left_top}, {self.width}, {self.height})"
 

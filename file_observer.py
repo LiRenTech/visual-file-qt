@@ -108,22 +108,46 @@ class FileObserver:
     ) -> EntityFile | EntityFolder | None:
         """
         判断一个点是否击中了某个实体文件
-        TODO: 这里应该用递归优化，避免每次都遍历所有实体文件
         :param location_world:
         :return:
         """
         if self.root_folder is None:
             return None
-        # 优先击中文件
-        for entity_file in self._entity_files(self.root_folder):
-            if location_world in entity_file.body_shape:
-                return entity_file
-        # 其次击中文件夹
-        entity_folders = self._entity_folders(self.root_folder)
-        # 文件夹列表按层级深度排序，越深的在前面
-        entity_folders.sort(key=lambda x: x.full_path.count("/"), reverse=True)
-        for entity_folder in entity_folders:
-            if location_world in entity_folder.body_shape:
-                return entity_folder
-        # 未击中任何实体
-        return None
+
+        return self._get_entity_by_location_dfs(location_world, self.root_folder)
+
+    def _get_entity_by_location_dfs(
+        self, location_world: NumberVector, currentEntity: EntityFile | EntityFolder
+    ) -> EntityFile | EntityFolder | None:
+        """递归的实现"""
+        # 当前没有点到东西
+        if not currentEntity.body_shape.is_contain_point(location_world):
+            return None
+
+        if isinstance(currentEntity, EntityFile):
+            # 是文件
+            return currentEntity
+        elif isinstance(currentEntity, EntityFolder):
+            # 是文件夹
+
+            # 如果当前文件夹内部隐藏了，则直接返回当前文件夹
+            if currentEntity.is_hide_inner:
+                return currentEntity
+
+            # 看看是不是击中了内部的东西
+            for child in currentEntity.children:
+                if isinstance(child, EntityFile):
+                    # 是否击中文件
+                    if child.body_shape.is_contain_point(location_world):
+                        return child
+
+                elif isinstance(child, EntityFolder):
+                    # 是否击中文件夹
+                    res = self._get_entity_by_location_dfs(location_world, child)
+                    if res is not None:
+                        return res
+
+            # 未击中任何内部的东西，则返回当前文件夹
+            return currentEntity
+        else:
+            raise ValueError("Unknown entity type")
