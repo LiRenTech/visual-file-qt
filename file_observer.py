@@ -108,6 +108,7 @@ class FileObserver:
     ) -> EntityFile | EntityFolder | None:
         """
         判断一个点是否击中了某个实体文件
+        TODO: 这里应该用递归优化，避免每次都遍历所有实体文件
         :param location_world:
         :return:
         """

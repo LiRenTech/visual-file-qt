@@ -85,6 +85,7 @@ class PainterUtils:
         height: float,
         fill_color: QColor,
         stroke_color: QColor,
+        stroke_width: int,
     ):
         """
         绘制一个矩形，左上角坐标为left_top，宽为width，高为height，填充色为fill_color，边框色为stroke_color
@@ -96,13 +97,16 @@ class PainterUtils:
         :param stroke_color:
         :return:
         """
-
-        painter.setPen(stroke_color)
+        # 设置边框宽度
+        pen = QPen(stroke_color, stroke_width)
+        painter.setPen(pen)
+        # painter.setPen(stroke_color)
         painter.setBrush(fill_color)
         painter.setRenderHint(QPainter.Antialiasing)
         painter.drawRect(int(left_top.x), int(left_top.y), int(width), int(height))
         painter.setPen(QColor(0, 0, 0, 0))
         painter.setBrush(QColor(0, 0, 0, 0))
+
         painter.setRenderHint(QPainter.Antialiasing, False)
         pass
 

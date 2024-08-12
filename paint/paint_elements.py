@@ -94,6 +94,7 @@ def paint_rect_in_world(
         rect.height * camera.current_scale,
         fill_color,
         stroke_color,
+        1,
     )
 
 
@@ -109,6 +110,7 @@ def paint_file_rect(
         entity_file.body_shape.height * camera.current_scale,
         QColor(0, 0, 0, 255),
         get_color_by_level(color_rate),
+        1,
     )
     # camera scale < 0.15 的时候不渲染文字了，会导致文字突然变大，重叠一大堆
     if camera.current_scale < 0.15:
@@ -140,11 +142,14 @@ def paint_selected_rect(
     """
     PainterUtils.paint_rect_from_left_top(
         paint,
-        camera.location_world2view(selected_entity.body_shape.location_left_top),
-        selected_entity.body_shape.width * camera.current_scale,
-        selected_entity.body_shape.height * camera.current_scale,
+        camera.location_world2view(
+            selected_entity.body_shape.location_left_top - NumberVector(5, 5)
+        ),
+        (selected_entity.body_shape.width + 10) * camera.current_scale,
+        (selected_entity.body_shape.height + 10) * camera.current_scale,
         QColor(89, 158, 94, 100) if is_active else QColor(0, 0, 0, 0),
         QColor(0, 255, 0, 255) if is_active else QColor(255, 0, 0, 255),
+        4,
     )
 
 
@@ -167,6 +172,7 @@ def paint_folder_rect(
         entity_file.body_shape.height * camera.current_scale,
         QColor(255, 255, 255, 0),
         get_color_by_level(color_rate),
+        1,
     )
     if camera.current_scale < 0.05:
         return
