@@ -42,17 +42,14 @@ class Entity(Paintable, metaclass=ABCMeta):
 
         # self_center_location -> entity_center_location
         d_distance = entity_center_location - self_center_location
-
+        # fmt: off
         choice_func: list[list[Callable]] = [
-            # x < 0  , x == 0 , x > 0
-            [self._move_left_up, self._move_up, self._move_right_up],  # y < 0
-            [self._move_left, self._move_down, self._move_right],  # y == 0
-            [
-                self._move_left_down,
-                self._move_down,
-                self._move_right_down,
-            ],  # y > 0
+            # x < 0  ,         x == 0 ,                x > 0
+            [self._move_left_up, self._move_up, self._move_right_up],        # y < 0
+            [self._move_left, self._move_down, self._move_right],            # y == 0
+            [self._move_left_down, self._move_down, self._move_right_down],    # y > 0
         ]
+        # fmt: on
 
         def number_to_index(x):
             if x < 0:
