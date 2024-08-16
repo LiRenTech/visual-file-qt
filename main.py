@@ -47,6 +47,7 @@ from tools.threads import OpenFolderThread
 
 from assets import assets
 
+
 # 是为了引入assets文件夹中的资源文件，看似是灰色的没有用，但实际不能删掉
 # 只是为了让pyinstaller打包时能打包到exe文件中。
 # 需要进入assets文件夹后在命令行输入指令 `pyrcc5 image.rcc -o assets.py` 来更新assets.py文件
@@ -58,6 +59,9 @@ class Canvas(QMainWindow):
         super().__init__()
 
         self._open_folder_thread = None
+        # 界面初始化
+        self.zoom_in_button = QPushButton("透视+", self)
+        self.zoom_out_button = QPushButton("透视-", self)
         self.init_ui()
 
         # 重要对象绑定
@@ -85,6 +89,14 @@ class Canvas(QMainWindow):
         self.setGeometry(0, 0, 1920, 1080)
         self.setWindowIcon(QIcon(":/favicon.ico"))
         self._move_window_to_center()
+
+        # 在界面右上角增加两个按钮“+”“-”
+        self.zoom_in_button.setGeometry(140, 60, 100, 50)
+        self.zoom_in_button.clicked.connect(lambda: self.camera.add_perspective_level())
+        self.zoom_in_button.setStyleSheet("background-color: rgb(30, 215, 109);")
+        self.zoom_out_button.setGeometry(20, 60, 100, 50)
+        self.zoom_out_button.clicked.connect(lambda: self.camera.reduce_perspective_level())
+        self.zoom_out_button.setStyleSheet("background-color: rgb(30, 215, 109);")
 
         # 创建菜单栏
         menubar = self.menuBar()
@@ -408,9 +420,11 @@ class Canvas(QMainWindow):
             painter,
             self.camera,
             [
-                f"{self.file_observer.root_folder.full_path if self.file_observer.root_folder else 'no root folder'}",
-                f"drag locked: {self.file_observer.is_drag_locked}",
-                f"drag state: {self.file_observer.interactive_state.name}",
+                f"当前缩放: {self.camera.current_scale:.2f} location: {self.camera.location}"
+                f"当前目录：{self.file_observer.root_folder.full_path if self.file_observer.root_folder else '没有目录'}",
+                f"拖拽锁定: {self.file_observer.is_drag_locked}",
+                f"鼠标状态: {self.file_observer.interactive_state.name}",
+                f"透视等级：{self.camera.perspective_level}",
             ],
         )
 
@@ -469,11 +483,11 @@ class Canvas(QMainWindow):
                 # 开始拖拽，更新每个被拖拽实体的 dragging_offset
                 for entity in self.file_observer.dragging_entity_list:
                     entity.dragging_offset = (
-                        point_world_location - entity.body_shape.location_left_top
+                            point_world_location - entity.body_shape.location_left_top
                     )
         elif (
-            a0.button() == Qt.MouseButton.MiddleButton
-            or a0.button() == Qt.MouseButton.RightButton
+                a0.button() == Qt.MouseButton.MiddleButton
+                or a0.button() == Qt.MouseButton.RightButton
         ):
             # 开始准备移动，记录好上一次鼠标位置的相差距离向量
             self._last_mouse_move_location = self.camera.location_view2world(
@@ -537,8 +551,8 @@ class Canvas(QMainWindow):
                     traceback.print_exc()
                     pass
         if (
-            a0.buttons() == Qt.MouseButton.MiddleButton
-            or a0.buttons() == Qt.MouseButton.RightButton
+                a0.buttons() == Qt.MouseButton.MiddleButton
+                or a0.buttons() == Qt.MouseButton.RightButton
         ):
             # 移动的时候，应该记录与上一次鼠标位置的相差距离向量
             current_mouse_move_location = self.camera.location_view2world(
@@ -563,7 +577,7 @@ class Canvas(QMainWindow):
                     )
                     # 但前提是这个矩形不能是超大矩形，即没有被屏幕完全覆盖住的
                     if point_entity and self.camera.cover_world_rectangle.is_contain(
-                        point_entity.body_shape
+                            point_entity.body_shape
                     ):
                         self.file_observer.dragging_entity_list = [point_entity]
 
@@ -573,8 +587,8 @@ class Canvas(QMainWindow):
                 self.file_observer.interactive_state = InteractiveState.SELECT
 
         if (
-            a0.button() == Qt.MouseButton.MiddleButton
-            or a0.button() == Qt.MouseButton.RightButton
+                a0.button() == Qt.MouseButton.MiddleButton
+                or a0.button() == Qt.MouseButton.RightButton
         ):
             if self.file_observer.is_drag_locked:
                 return

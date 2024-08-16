@@ -33,14 +33,15 @@ class EntityFolderDefaultStyle(Styleable):
         self.root_folder = root_folder
         self.folder_max_deep_index = folder_max_deep_index
 
-    def f(self, camera_current_scale: float) -> float:
+    @staticmethod
+    def calculate_deep(camera_current_scale: float) -> float:
         """
         根据当前缩放比例，计算出文件夹的最大深度
         x：当前缩放比例
         放大看细节：>1
         缩小看宏观：<1
         y：当前视野能看到的文件夹深度等级，也就是函数线下面的是能看到的，上面的深度是看不到的
-
+        # 暂时弃用
         """
         if camera_current_scale >= 1:
             return float("inf")
@@ -55,9 +56,9 @@ class EntityFolderDefaultStyle(Styleable):
         current_deep_index 从0开始，表示当前文件夹的深度
         """
         # 看看是否因为缩放太小，视野看到的太宏观，就不绘制太细节的东西
-        exclude_level = self.f(context.camera.current_scale)
+        exclude_level = context.camera.perspective_level
         if current_deep_index != 0 and current_deep_index > exclude_level:
-            print("skip folder deep index", current_deep_index)
+            # print("skip folder deep index", current_deep_index)
             return
         q = context.painter.q_painter()
         # 先绘制本体
@@ -86,7 +87,7 @@ class EntityFolderDefaultStyle(Styleable):
             if isinstance(child, EntityFolder):
                 self._paint_folder_dfs(context, child, child_deep_index)
             elif isinstance(child, EntityFile):
-                if child_deep_index > self.f(context.camera.current_scale):
+                if child_deep_index > exclude_level:
                     continue
                 if child.body_shape.is_collision(context.camera.cover_world_rectangle):
                     color_rate = child.deep_level / self.folder_max_deep_index

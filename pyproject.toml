@@ -1,0 +1,11 @@
+[project]
+dependencies = [
+    "PyQt5==5.15.10",
+    "PyQt5_sip==12.13.0",
+    "gitignore-parser==0.1.11"
+]
+
+
+[tool.black]
+line-length = 88
+target-version = ['py36', 'py37', 'py38']

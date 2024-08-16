@@ -16,8 +16,8 @@ class Camera:
 
     scaleExponent = 1.1  # 缩放指数，越大缩放速度越快
 
-    SCALE_MAX = 150
-    SCALE_MIN = 0.001
+    SCALE_MAX = 5000
+    SCALE_MIN = 0.0000001
 
     """
     空气摩擦力速度指数
@@ -44,6 +44,18 @@ class Camera:
         # 可以看成一个九宫格，主要用于处理 w s a d 按键移动，
         self.accelerateCommander = NumberVector(0, 0)
         self.is_scale_animation_open = True
+        # 当前摄像机的透视能力，0表示连根文件夹都看不透，1表示能看透一层，2表示能看透两层
+        self.perspective_level = 3
+
+    def add_perspective_level(self):
+        self.perspective_level += 1
+        if self.perspective_level > 118:  # windows最大文件夹深度就是118
+            self.perspective_level = 118
+
+    def reduce_perspective_level(self):
+        self.perspective_level -= 1
+        if self.perspective_level < 0:
+            self.perspective_level = 0
 
     def reset(self):
         """外界调用，重置相机状态"""
@@ -103,12 +115,12 @@ class Camera:
             if not self.speed.is_zero():
                 speed_size = self.speed.magnitude()
                 friction = (
-                    self.speed.normalize()
-                    * -1
-                    * (self.frictionCoefficient * speed_size**self.frictionExponent)
+                        self.speed.normalize()
+                        * -1
+                        * (self.frictionCoefficient * speed_size ** self.frictionExponent)
                 )
             self.speed += self.accelerateCommander * (
-                self.moveAmplitude * (1 / self.current_scale)
+                    self.moveAmplitude * (1 / self.current_scale)
             )
             self.speed += friction
 
@@ -140,10 +152,7 @@ class Camera:
         height = self.view_height / self.current_scale
 
         return Rectangle(
-            NumberVector(
-                self.location.x - width / 2,
-                self.location.y - height / 2,
-            ),
+            NumberVector(self.location.x - width / 2, self.location.y - height / 2),
             width,
             height,
         )
@@ -165,8 +174,8 @@ class Camera:
         :return:
         """
         v: NumberVector = (
-            view_location - NumberVector(self.view_width / 2, self.view_height / 2)
-        ) / self.current_scale
+                                  view_location - NumberVector(self.view_width / 2, self.view_height / 2)
+                          ) / self.current_scale
         return v + self.location
 
     def get_world2view_transform(self) -> QTransform:

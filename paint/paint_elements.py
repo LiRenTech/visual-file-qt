@@ -43,18 +43,11 @@ def paint_details_data(paint: QPainter, camera: Camera, datas: list[str]):
     :param datas:
     :return:
     """
-    start_y = 100
-    PainterUtils.paint_word_from_left_top(
-        paint,
-        NumberVector(0, 50),  # 左上角坐标
-        f"camera scale: {camera.current_scale:.2f} location: {camera.location}",
-        12,
-        QColor(255, 255, 255, 100),
-    )
+    start_y = 150
     for i, data in enumerate(datas):
         PainterUtils.paint_word_from_left_top(
             paint,
-            NumberVector(0, start_y + i * 50),
+            NumberVector(20, start_y + i * 50),
             data,
             12,
             QColor(255, 255, 255, 100),
