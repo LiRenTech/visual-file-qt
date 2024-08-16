@@ -139,7 +139,7 @@ class EntityFolder(Entity):
         # 移动文件夹内所有实体
         for child in self.children:
             relative_location = (
-                child.body_shape.location_left_top - self.body_shape.location_left_top
+                    child.body_shape.location_left_top - self.body_shape.location_left_top
             )
             # 这本身实际上是一个递归函数了
             child.move_to(location_left_top + relative_location)
@@ -228,8 +228,8 @@ class EntityFolder(Entity):
                         # 还要继续深入检查这个文件夹内部是否有更新
                         for chile in self.children:
                             if (
-                                isinstance(chile, EntityFolder)
-                                and chile.folder_name == file_name_sub
+                                    isinstance(chile, EntityFolder)
+                                    and chile.folder_name == file_name_sub
                             ):
                                 # 找到这个原有的子文件夹并递归下去
                                 chile.update_tree_content()
@@ -293,10 +293,10 @@ class EntityFolder(Entity):
             )
 
         if (
-            self.body_shape.left() == left_bound
-            and self.body_shape.right() == right_bound
-            and self.body_shape.top() == top_bound
-            and self.body_shape.bottom() == bottom_bound
+                self.body_shape.left() == left_bound
+                and self.body_shape.right() == right_bound
+                and self.body_shape.top() == top_bound
+                and self.body_shape.bottom() == bottom_bound
         ):
             # 如果没有变化，就不用调整了
             return
@@ -355,7 +355,7 @@ class EntityFolder(Entity):
             sort_strategy_function = sort_rectangle_greedy
         else:
             if all(isinstance(child, EntityFolder) for child in folder.children) or all(
-                isinstance(child, EntityFile) for child in folder.children
+                    isinstance(child, EntityFile) for child in folder.children
             ):
                 # 如果全是文件夹或者全是文件，按照正常的矩形排列
                 sort_strategy_function = sort_rectangle_all_files
@@ -373,8 +373,8 @@ class EntityFolder(Entity):
 
         for i, rect in enumerate(rectangle_list):
             if (
-                sorted_rectangle_list[i].width != rect.width
-                or sorted_rectangle_list[i].height != rect.height
+                    sorted_rectangle_list[i].width != rect.width
+                    or sorted_rectangle_list[i].height != rect.height
             ):
                 print("排序策略错误")
         # ===
@@ -395,7 +395,10 @@ class EntityFolder(Entity):
     def paint(self, context: PaintContext) -> None:
         context.painter.paint_rect(self.body_shape)
         if self.is_hide_inner:
-            context.painter.paint_text(Text(self.body_shape.center, self.folder_name))
+            context.painter.paint_text_in_rect(
+                self.folder_name, self.body_shape
+            )
+            pass
         else:
             context.painter.paint_text(
                 Text(self.body_shape.location_left_top, self.folder_name)
