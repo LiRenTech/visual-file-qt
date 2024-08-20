@@ -69,19 +69,19 @@ class Entity(Paintable, metaclass=ABCMeta):
     # 例如 _move_left 表示被挤压的矩形是自己左边的矩形 other表示挤压的矩形
 
     def _move_right(self, other: "Entity"):
-        d_x = self.body_shape.right() - other.body_shape.left() - 1
+        d_x = self.body_shape.right() - other.body_shape.left()
         other.move(NumberVector(d_x, 0))
 
     def _move_left(self, other: "Entity"):
-        d_x = self.body_shape.left() - other.body_shape.right() - 1
+        d_x = self.body_shape.left() - other.body_shape.right()
         other.move(NumberVector(d_x, 0))
 
     def _move_up(self, other: "Entity"):
-        d_y = self.body_shape.top() - other.body_shape.bottom() - 1
+        d_y = self.body_shape.top() - other.body_shape.bottom()
         other.move(NumberVector(0, d_y))
 
     def _move_down(self, other: "Entity"):
-        d_y = self.body_shape.bottom() - other.body_shape.top() - 1
+        d_y = self.body_shape.bottom() - other.body_shape.top()
         other.move(NumberVector(0, d_y))
 
     # 上面四种非常难做到，因为人手动拖拽很难完全对准，并且又是float类型
